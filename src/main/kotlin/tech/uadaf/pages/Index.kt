@@ -33,7 +33,7 @@ fun HTML.index() = basePage(head = {
         div {
             p("index-foot") {
                 strong { +"Source:" }
-                a("https://github.com/frangiclave/frangiclave-compendium") { +"frangiclave/frangiclave-compendium" }
+                a("https://github.com/gt22/frangiclave") { +"gt22/frangiclave" }
             }
             p("index-foot") {
                 +"Hosted by Frgm"
