@@ -26,7 +26,7 @@ fun DIV.element(x: Element) = dataPage(x) {
         }
     }
     field("Slots: ") { slots(*x.slots.toTypedArray()) }
-    field("Cross Triggers: ") { xtriggers(x.xtriggers) }
+    field("Triggered by: ") { xtriggers(x.xtriggers) }
     field("Triggered from: ") {
         val triggers = content.elements.asSequence()
             .flatMap { source ->
@@ -40,7 +40,7 @@ fun DIV.element(x: Element) = dataPage(x) {
             .toList()
         trggeredFromList(triggers)
     }
-    field("Triggered by: ") {
+    field("Triggers: ") {
         val triggers = content.elements.asSequence()
             .flatMap { source ->
                 source.xtriggers.asSequence()
