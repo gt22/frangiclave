@@ -3,9 +3,6 @@ package tech.uadaf.pages.data
 import dawnbreaker.data.raw.Legacy
 import dawnbreaker.locale.data.LegacyLocale
 import kotlinx.html.DIV
-import kotlinx.html.a
-import tech.uadaf.csdata.endingPage
-import tech.uadaf.csdata.verbPage
 import tech.uadaf.pages.*
 
 fun DIV.legacy(x: Legacy) = dataPage(x) {

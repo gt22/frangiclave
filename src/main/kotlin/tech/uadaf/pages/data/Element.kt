@@ -2,9 +2,10 @@ package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Element
 import dawnbreaker.locale.data.ElementLocale
-import kotlinx.html.*
+import kotlinx.html.DIV
+import kotlinx.html.br
+import kotlinx.html.em
 import tech.uadaf.content
-import tech.uadaf.csdata.recipePage
 import tech.uadaf.pages.*
 
 fun DIV.element(x: Element) = dataPage(x) {

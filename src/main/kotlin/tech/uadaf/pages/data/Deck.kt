@@ -2,7 +2,6 @@ package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Deck
 import dawnbreaker.locale.data.DeckLocale
-import dawnbreaker.locale.data.SlotLocale
 import kotlinx.html.DIV
 import kotlinx.html.em
 import kotlinx.html.li

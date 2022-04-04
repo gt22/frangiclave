@@ -2,7 +2,10 @@ package tech.uadaf.pages
 
 import dawnbreaker.data.raw.*
 import dawnbreaker.locale.LocaleData
+import dawnbreaker.locale.data.ElementLocale
+import dawnbreaker.locale.data.RecipeLocale
 import dawnbreaker.locale.data.SlotLocale
+import dawnbreaker.locale.data.VerbLocale
 import kotlinx.html.*
 import tech.uadaf.content
 import tech.uadaf.csdata.*
@@ -50,10 +53,14 @@ fun FlowContent.str(x: String) {
     }
 }
 
+@Suppress("UNCHECKED_CAST")
+fun <T : Data, L : LocaleData<T>> localizeInline(x: T, get: (L) -> String) =
+    locales.joinToString("$$") { runCatching { get(it[x] as L) }.getOrElse { "" } }
+
 fun FlowContent.elementRef(id: String, amount: String = "1") = a(aspectPage(id), classes = "element-ref ref") {
     val aspect = content.lookup<Element>(id)
     if (aspect != null) {
-        title = aspect.label //TODO: Localization
+        title = localizeInline(aspect) { a: ElementLocale -> a.label }
     }
     if (amount != "1") {
         span("element-ref ref-text ref-amount") { +amount }
@@ -67,7 +74,7 @@ fun FlowContent.elementRef(id: String, amount: String = "1") = a(aspectPage(id),
 fun FlowContent.verbRef(id: String, amount: String = "1") = a(verbPage(id), classes = "verb-ref ref") {
     val verb = content.lookup<Verb>(id)
     if (verb != null) {
-        title = verb.label //TODO: Localization
+        title = localizeInline(verb) { a: VerbLocale -> a.label }
     }
     if (amount != "1") {
         span("verb-ref ref-text ref-amount") { +amount }
@@ -100,7 +107,7 @@ fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<Stri
     a(recipePage(id), classes = "recipe-ref ref") {
         val recipe = content.lookup<Recipe>(id)
         if (recipe != null) {
-            title = recipe.label //TODO: Localization
+            title = localizeInline(recipe) { a: RecipeLocale -> a.label }
         }
         if (amount.isNotBlank()) {
             span("recipe-ref ref-text ref-amount") { +amount }
