@@ -40,7 +40,7 @@ val jar by tasks.getting(Jar::class) {
 
 dependencies {
     implementation("org.fusesource.jansi:jansi:2.4.0")
-    implementation("com.frgm:dawnbreaker:0.1.4.0")
+    implementation("com.frgm:dawnbreaker:0.1.5.2")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-host-common-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktor_version")

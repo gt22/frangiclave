@@ -1,6 +1,8 @@
 package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Deck
+import dawnbreaker.locale.data.DeckLocale
+import dawnbreaker.locale.data.SlotLocale
 import kotlinx.html.DIV
 import kotlinx.html.em
 import kotlinx.html.li
@@ -8,8 +10,8 @@ import kotlinx.html.ul
 import tech.uadaf.pages.*
 
 fun DIV.deck(x: Deck) = dataPage(x) {
-    field("Label: ") { localizations(x.label) }
-    field("Description: ") { localizations(x.description) }
+    field("Label: ") { localizations(x) { s: DeckLocale -> s.label }}
+    field("Description: ") { localizations(x) { s: DeckLocale -> s.description } }
     field("Draw Messages: ") {
         if(x.drawmessages.isEmpty()) {
             em { +"None" }
@@ -18,7 +20,7 @@ fun DIV.deck(x: Deck) = dataPage(x) {
                 x.drawmessages.forEach { (id, msg) ->
                     li {
                         elementRef(id)
-                        localizations(msg)
+                        localizations(x) { s: DeckLocale -> s.drawmessages[id] ?: "None" }
                     }
                 }
             }

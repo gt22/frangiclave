@@ -1,14 +1,15 @@
 package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Element
+import dawnbreaker.locale.data.ElementLocale
 import kotlinx.html.*
 import tech.uadaf.content
 import tech.uadaf.csdata.recipePage
 import tech.uadaf.pages.*
 
 fun DIV.element(x: Element) = dataPage(x) {
-    field("Label: ") { localizations(x.label) }
-    field("Description: ") { localizations(x.description) }
+    field("Label: ") { localizations(x) { e : ElementLocale -> e.label } }
+    field("Description: ") { localizations(x) { e : ElementLocale -> e.description } }
     field("Aspects: ") { elementList(x.aspects) }
     field("Induces: ") {
         if (x.induces.isEmpty()) {

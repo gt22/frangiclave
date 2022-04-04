@@ -10,6 +10,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import tech.uadaf.plugins.*
 import dawnbreaker.loadVanilla
+import dawnbreaker.locale.Locale
 import dawnbreaker.vanilla
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
@@ -18,6 +19,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -25,8 +27,13 @@ val config = Json.decodeFromStream<Config>(Files.newInputStream(Path.of("config.
 val baseUrl
     get() = config.baseUrl
 lateinit var content: Mod
+val locales: MutableList<Locale> = mutableListOf()
 
-fun prepareContent() {
+private fun loadLocale(name: String) {
+    locales.add(Locale.load(name, vanilla, Paths.get(config.contentDir).resolve("loc_$name")))
+}
+
+private fun prepareContent() {
     loadVanilla(Path.of(config.contentDir))
     content = vanilla
     content.recipes.asSequence().filter { it.internaldeck != null }.forEach {
@@ -53,6 +60,11 @@ fun prepareContent() {
             }
         }
     }.t
+    loadLocale("en")
+    loadLocale("ru")
+    loadLocale("zh-hans")
+    loadLocale("de")
+    loadLocale("jp")
 }
 
 fun main() {

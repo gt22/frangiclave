@@ -1,9 +1,12 @@
 package tech.uadaf.pages
 
 import dawnbreaker.data.raw.*
+import dawnbreaker.locale.LocaleData
+import dawnbreaker.locale.data.SlotLocale
 import kotlinx.html.*
 import tech.uadaf.content
 import tech.uadaf.csdata.*
+import tech.uadaf.locales
 
 fun FlowContent.field(name: String, content: P.() -> Unit) = p("content-field") {
     strong("field-title") {
@@ -19,9 +22,21 @@ fun FlowContent.subfield(name: String, content: SPAN.() -> Unit) = span("content
     content()
 }
 
-fun FlowContent.localizations(x: String) {
-    if (x.isNotBlank()) {
-        ul("localizations") { li("localizations-item") { +x } }
+@Suppress("UNCHECKED_CAST")
+fun <T : Data, L : LocaleData<T>> FlowContent.localizations(x: T, get: (L) -> String) {
+    val base = runCatching { locales[0][x] as L }
+    if (base.map(get).getOrElse { "" }.isNotBlank()) {
+        ul("localizations") {
+            locales.forEach {
+                li("localizations-item") {
+                    try {
+                        +get(it[x] as L)
+                    } catch (e: IllegalArgumentException) {
+                        +"Unlocalized for ${it.name.uppercase()}"
+                    }
+                }
+            }
+        }
     } else {
         em { +"None" }
     }
@@ -75,26 +90,29 @@ fun FlowContent.elementListS(elements: Map<String, String>) = span("element-ref 
     if (elements.isEmpty()) {
         em { +"None" }
     } else {
-        elements.forEach { elementRef(it.key, it.value)}
+        elements.forEach { elementRef(it.key, it.value) }
     }
 }
 
 fun FlowContent.elementList(elements: Map<String, Int>) = elementListS(elements.mapValues { it.value.toString() })
 
-fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<String> = emptyList()) = a(recipePage(id), classes = "recipe-ref ref") {
-    val recipe = content.lookup<Recipe>(id)
-    if (recipe != null) {
-        title = recipe.label //TODO: Localization
-    }
-    if(amount.isNotBlank()) { span("recipe-ref ref-text ref-amount") { +amount } }
-    img(id, aspect("ritual"), classes = "recipe-ref ref-icon") {}
-    span("recipe-ref ref-text ref-id") { +id }
-    challenges.forEach {
-        img("Challenge: $it", aspect(it), classes = "recipe-ref ref-challenge") {
-            onError = "this.src='${aspect("_x")}'"
+fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<String> = emptyList()) =
+    a(recipePage(id), classes = "recipe-ref ref") {
+        val recipe = content.lookup<Recipe>(id)
+        if (recipe != null) {
+            title = recipe.label //TODO: Localization
+        }
+        if (amount.isNotBlank()) {
+            span("recipe-ref ref-text ref-amount") { +amount }
+        }
+        img(id, aspect("ritual"), classes = "recipe-ref ref-icon") {}
+        span("recipe-ref ref-text ref-id") { +id }
+        challenges.forEach {
+            img("Challenge: $it", aspect(it), classes = "recipe-ref ref-challenge") {
+                onError = "this.src='${aspect("_x")}'"
+            }
         }
     }
-}
 
 fun FlowContent.recipeListC(recipes: Map<String, Pair<String, List<String>>>) = span("recipe-ref ref-list") {
     if (recipes.isEmpty()) {
@@ -114,7 +132,7 @@ fun FlowContent.recipeListC(recipes: Map<String, Pair<String, List<String>>>) = 
 fun FlowContent.recipeList(recipes: Map<String, String>) = recipeListC(recipes.mapValues { it.value to emptyList() })
 
 fun FlowContent.deckRef(id: String, amount: String = "1") = a(deckPage(id), classes = "deck-ref ref") {
-    if(amount != "1") {
+    if (amount != "1") {
         span("deck-ref ref-text ref-amount") { +amount }
     }
     img(id, aspect("library"), classes = "deck-ref ref-icon") {}
@@ -132,15 +150,15 @@ fun FlowContent.deckList(decks: Map<String, String>) = span("deck-ref ref-list")
 fun FlowContent.xtrigger(trigger: String, x: XTrigger) = span("xtrigger") {
     elementRef(trigger)
     +" -> "
-    when(x.morpheffect.lowercase()) {
+    when (x.morpheffect.lowercase()) {
         "", "transform" -> elementRef(x.id)
         "spawn" -> elementRef(x.id, "Spawn ${x.level}")
-        "mutate" -> elementRef(x.id, "Mutate ${if(x.level > 0) "+${x.level}" else x.level.toString()}")
+        "mutate" -> elementRef(x.id, "Mutate ${if (x.level > 0) "+${x.level}" else x.level.toString()}")
     }
 }
 
 fun FlowContent.xtriggers(x: Map<String, List<XTrigger>>) {
-    if(x.isEmpty()) {
+    if (x.isEmpty()) {
         em { +"None" }
     } else {
         ul {
@@ -160,7 +178,7 @@ fun FlowContent.triggeredFrom(source: String, trigger: String) {
 }
 
 fun FlowContent.trggeredFromList(triggers: List<Pair<String, String>>) {
-    if(triggers.isEmpty()) {
+    if (triggers.isEmpty()) {
         em { +"None" }
     } else {
         ul {
@@ -174,11 +192,11 @@ fun FlowContent.trggeredFromList(triggers: List<Pair<String, String>>) {
 fun FlowContent.mutation(x: Mutation) {
     elementRef(x.filter)
     +" -> "
-    elementRef(x.mutate, if(x.additive && x.level > 0) "+${x.level}" else x.level.toString())
+    elementRef(x.mutate, if (x.additive && x.level > 0) "+${x.level}" else x.level.toString())
 }
 
 fun FlowContent.mutations(x: List<Mutation>) {
-    if(x.isEmpty()) {
+    if (x.isEmpty()) {
         em { +"None" }
     } else {
         ul {
@@ -214,7 +232,7 @@ fun FlowContent.dictaRef(id: String) = a(dictaPage(id), classes = "dicta-ref ref
     span("dicta-ref ref-text ref-id") { +id }
 }
 
-fun FlowContent.dataRef(x: Data) = when(x) {
+fun FlowContent.dataRef(x: Data) = when (x) {
     is Deck -> deckRef(x.id)
     is Element -> elementRef(x.id)
     is Ending -> endingRef(x.id)
@@ -228,8 +246,8 @@ fun FlowContent.dataRef(x: Data) = when(x) {
 }
 
 fun UL.slot(x: Slot) = li {
-    subfield("Label: ") { localizations(x.label) }
-    subfield("Description: ") { localizations(x.description) }
+    subfield("Label: ") { localizations(x) { s: SlotLocale -> s.label } }
+    subfield("Description: ") { localizations(x) { s: SlotLocale -> s.description } }
     subfield("Required: ") { elementList(x.required) }
     subfield("Forbidden: ") { elementList(x.forbidden) }
     subfield("Greedy? ") { bool(x.greedy) }
@@ -237,7 +255,7 @@ fun UL.slot(x: Slot) = li {
 }
 
 fun FlowContent.slots(vararg slots: Slot) {
-    if(slots.isEmpty()) {
+    if (slots.isEmpty()) {
         em { +"None" }
     } else {
         ul {

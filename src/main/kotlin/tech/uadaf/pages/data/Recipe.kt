@@ -1,6 +1,7 @@
 package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Recipe
+import dawnbreaker.locale.data.RecipeLocale
 import kotlinx.html.DIV
 import kotlinx.html.a
 import kotlinx.html.em
@@ -15,9 +16,9 @@ fun Recipe.toLink(): Pair<String, Pair<String, List<String>>> {
 }
 
 fun DIV.recipe(x: Recipe) = dataPage(x) {
-    field("Label: ") { localizations(x.label) }
-    field("Start Description: ") { localizations(x.startdescription) }
-    field("Description: ") { localizations(x.description) }
+    field("Label: ") { localizations(x) { r: RecipeLocale -> r.label } }
+    field("Start Description: ") { localizations(x) { r: RecipeLocale -> r.startdescription } }
+    field("Description: ") { localizations(x) { r: RecipeLocale -> r.description } }
     field("Verb: ") { if(x.actionid.isNotBlank()) verbRef(x.actionid) else em { +"None" } }
     field("Requirements: ") { elementListS(x.requirements) }
     field("Table Requirements: ") { elementList(x.tablereqs) }

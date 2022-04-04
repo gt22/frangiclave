@@ -28,8 +28,8 @@ data class Portal(
  */
 
 fun DIV.portal(x: Portal) = dataPage(x) {
-    field("Label: ") { localizations(x.label) }
-    field("Description: ") { localizations(x.description) }
+    field("Label: ") { str(x.label) }
+    field("Description: ") { str(x.description) }
     field("Otherworld: ") { str(x.otherworldId) }
     field("Egress: ") { str(x.egressId) }
     field("Consequences: ") {
