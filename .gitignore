@@ -4,3 +4,4 @@ build/
 .idea
 out/
 content_norm
+src/main/resources/static/images
