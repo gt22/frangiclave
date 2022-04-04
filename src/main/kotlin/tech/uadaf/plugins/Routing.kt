@@ -37,13 +37,6 @@ fun Application.configureRouting() {
             }
         }
 
-        get("/deck/internal:{id}") {
-            val id = call.parameters["id"] ?: throw NotFoundException()
-            val deck = content.lookup<Recipe>(id)?.internaldeck ?: throw NotFoundException()
-            call.respondHtml { basePage("recipe:$id") { deck(deck) } }
-        }
-
-
         dataPage<Verb>("verb") { verb(it) }
         dataPage<Deck>("deck") { deck(it) }
         dataPage<Ending>("ending") { ending(it) }
@@ -57,6 +50,9 @@ fun Application.configureRouting() {
         // Static plugin. Try to access `/static/index.html`
         static("/static") {
             resources("static")
+        }
+        static("/static") {
+            files("static")
         }
         // Backwards compatibility with old FC:
         static("/static/images/icons40/aspects") {

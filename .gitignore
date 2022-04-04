@@ -5,3 +5,4 @@ build/
 out/
 content_norm
 src/main/resources/static/images
+static
