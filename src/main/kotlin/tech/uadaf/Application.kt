@@ -37,9 +37,6 @@ private fun loadLocale(name: String) {
 private fun prepareContent() {
     loadVanilla(Path.of(config.contentDir))
     content = vanilla
-    content.recipes.asSequence().filter { it.internaldeck != null }.forEach {
-        it.internaldeck!!.id = "internal:${it.id}"
-    }
     content.sources["temporary_verbs"] = SourceBuilder().apply {
         verbs {
             content.recipes.asSequence()
@@ -61,11 +58,19 @@ private fun prepareContent() {
             }
         }
     }.t
+    content.sources["internal_decks"] = SourceBuilder().apply {
+        decks {
+            content.recipes.asSequence().filter { it.internaldeck != null }.forEach {
+                it.internaldeck!!.id = "internal:${it.id}"
+                +it.internaldeck!!
+            }
+        }
+    }.t
     loadLocale("en")
-//    loadLocale("ru")
-//    loadLocale("zh-hans")
-//    loadLocale("de")
-//    loadLocale("jp")
+    loadLocale("ru")
+    loadLocale("zh-hans")
+    loadLocale("de")
+    loadLocale("jp")
 }
 
 fun main() {
