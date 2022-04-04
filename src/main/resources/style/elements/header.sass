@@ -1,18 +1,17 @@
-@import "fonts"
 header
-  background: #b956f4 url("http://52.48.142.75/frangiclave/static/img/felt.png")
+  background: var(--purple-background)
   font-family: $fonts-header
   padding: 0.4em 1.2em calc(0.4em + 3px)
   font-size: 2em
   h1
     display: inline
-    color: #331544
+    color: var(--header-title-color)
     font-size: 2em
     font-weight: bold
     letter-spacing: 1px
     margin: 0
     padding: 0
-    text-shadow: 2px 2px 3px rgb(255 255 255 / 10%)
+    text-shadow: var(--header-title-shadow)
   img
     height: 1.8em
     width: 1.8em
@@ -54,11 +53,25 @@ header
   background: rgba(75, 75, 75, 0.5)
 
 #search-submit
-  background: linear-gradient(#924cb7, #603888)
+  background: var(--search-submit-background)
   border-top-right-radius: 3px
   border-bottom-right-radius: 3px
-  color: #ece0ec
+  color: var(--search-submit-color)
   cursor: pointer
   font-weight: bold
   letter-spacing: 1px
   padding: 0.2em 0.4em
+
+
+#switchbox
+  margin-left: 1em
+  vertical-align: top
+  display: inline-flex
+  flex-flow: row nowrap
+
+  #lightswitch
+    display: flex
+    flex-flow: column nowrap
+
+  .lightswitch-ref.active
+    background-color: var(--ref-active-background)

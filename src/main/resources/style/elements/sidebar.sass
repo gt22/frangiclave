@@ -1,26 +1,26 @@
 #sidebar
-  background: #b956f4 url("static/images/frangiclave/felt.png")
+  background: var(--purple-background)
   width: 300px
   padding: 0
 
 #sections
-  background: linear-gradient(to right, #decede, #ffffff)
-  border: solid 1px #594a5a
+  background: var(--section-background)
+  border: solid 1px var(--sidebar-border)
   border-radius: 3px
-  box-shadow: 0 0 10px #906da5
+  box-shadow: 0 0 10px var(--sidebar-shadow)
   margin-bottom: 10px
   margin-left: 10px
   overflow: hidden
   position: relative
-  z-index: 1
+  z-index: 10
 
 .section-title:first-of-type 
   border-top: none
 
 .section-title 
-  background: linear-gradient(to right, #937398, #ab80ab)
-  border-top: solid 1px #594a5a
-  color: white
+  background: var(--section-title-background)
+  border-top: solid 1px var(--sidebar-border)
+  color: var(--section-title-color)
   cursor: pointer
   font-size: 1.3em
   font-weight: bold
@@ -31,6 +31,7 @@
   max-height: 0
   transition: max-height 0.5s ease-in-out
   overflow-y: scroll
+
 .section-list-opened
   display: block
   max-height: 600px
@@ -39,14 +40,14 @@
   margin-bottom: 1em
 
 .section-file-title 
-  color: #696969
+  color: var(--section-file-color)
   font-size: 0.8em
   font-style: italic
   padding: 0.3em
   word-break: break-all
 
 .section-item 
-  color: #233844
+  color: var(--section-item-color)
   display: block
   font-size: 0.9em
   padding: 0.2em 0.2em 0.2em 0.8em
@@ -59,4 +60,4 @@
   cursor: pointer
 
 #section-item-active
-  background-color: #cfb8d0
+  background-color: var(--section-active-item-background)

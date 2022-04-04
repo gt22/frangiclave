@@ -62,10 +62,10 @@ private fun prepareContent() {
         }
     }.t
     loadLocale("en")
-    loadLocale("ru")
-    loadLocale("zh-hans")
-    loadLocale("de")
-    loadLocale("jp")
+//    loadLocale("ru")
+//    loadLocale("zh-hans")
+//    loadLocale("de")
+//    loadLocale("jp")
 }
 
 fun main() {

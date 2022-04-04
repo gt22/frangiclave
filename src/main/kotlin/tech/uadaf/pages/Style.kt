@@ -43,3 +43,5 @@ class Sass {
 }
 
 val stylesheet by lazy { Sass().convertSass("/style/index.sass") }
+val lighttheme by lazy { Sass().convertSass("/style/theme_light.sass") }
+val darktheme by lazy { Sass().convertSass("/style/theme_dark.sass") }

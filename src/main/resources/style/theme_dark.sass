@@ -1,0 +1,47 @@
+@mixin header-darktheme
+  --search-submit-background: linear-gradient(#7f43a1, #502f75)
+  --search-submit-color: #b4b4b4
+  --header-title-color: #8836b6
+  --header-title-shadow: 2px 2px 3px rgb(0 0 0 / 30%)
+
+@mixin sidebar-darktheme
+  --section-background: linear-gradient(to right, #2f222f, #251f25)
+  --section-title-background: linear-gradient(to right, #342634, #3d2f3d)
+  --sidebar-shadow: #402e44
+  --sidebar-border: #594a5a
+  --section-title-color: #b4b4b4
+  --section-file-color: #c2c2c2
+  --section-item-color: #72b0d5
+  --section-active-item-background: #574357
+
+@mixin ref-darktheme
+  --ref-background: #35495d
+  --ref-active-background: #557393
+  --ref-color: #c2cdce
+
+@mixin content-darktheme
+  --content-background-color: #232323
+  --content-title-prefix-color: #ac80af
+  --content-link-hover-color: #a17ca2
+
+@mixin search-darktheme
+  --search-result-brackground: #202020
+
+@mixin footer-darktheme
+  --footer-shade: #232523
+
+@mixin darktheme
+  --background-color: #33302b
+  --text-color: #bfceda
+  --positive-color: white
+  --negative-color: black
+  --purple-background: #4d2667
+  @include header-darktheme
+  @include sidebar-darktheme
+  @include ref-darktheme
+  @include content-darktheme
+  @include search-darktheme
+  @include footer-darktheme
+
+body
+  @include darktheme

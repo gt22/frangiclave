@@ -1,0 +1,36 @@
+#content
+  background-color: var(--content-background-color)
+  box-shadow: 0 0 10px 8px var(--content-background-color)
+  flex: 1 1 0
+  padding: 1em
+
+  a
+    text-decoration: none
+    &:hover
+      color: var(--content-link-hover-color)
+  ul
+    list-style: none
+    padding: 0 1em
+    margin: 0
+
+  li
+    padding-left: 1em
+    padding-bottom: 0.2em
+    text-indent: -1em
+
+    &::before
+      content: "▪ "
+      color: #ad96ad
+      padding-right: 0.5em
+
+#content-title
+  border-bottom: solid 1px #6d556f
+  font-weight: bold
+  margin: 0
+  padding: 0 0 0.2em
+  word-break: break-all
+
+
+#content-title-prefix
+  color: var(--content-title-prefix-color)
+  font-weight: normal
