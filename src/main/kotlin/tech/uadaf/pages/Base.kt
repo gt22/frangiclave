@@ -148,12 +148,12 @@ fun HEAD.inlinedThemeScript() = script {
                 "    if (darkModeStyles == null)\n" +
                 "        return;\n" +
                 "    modeOption = localStorage.getItem(\"theme\");\n" +
-                "    if (modeOption == 'auto') {\n" +
-                "        darkModeStyles.media = \"all and (prefers-color-scheme: dark)\";\n" +
+                "    if (modeOption == 'light') {\n" +
+                "        darkModeStyles.media = \"not all\";\n" +
                 "    } else if (modeOption == 'dark') {\n" +
                 "        darkModeStyles.media = \"all\";\n" +
                 "    } else {\n" +
-                "        darkModeStyles.media = \"not all\";\n" +
+                "        darkModeStyles.media = \"all and (prefers-color-scheme: dark)\";\n" +
                 "    }\n" +
                 "}\n")
         +"updateTheme();\n"
