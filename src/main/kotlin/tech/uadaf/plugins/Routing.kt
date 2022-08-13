@@ -56,22 +56,22 @@ fun Application.configureRouting() {
         }
         // Backwards compatibility with old FC:
         static("/static/images/icons40/aspects") {
-            resources("/static/images/aspects")
+            files("static/images/aspects")
         }
         static("/static/images/burnImages") {
-            resources("/static/images/burnimages")
+            files("static/images/burnimages")
         }
         static("/static/images/elementArt") {
-            resources("/static/images/elements")
+            files("static/images/elements")
         }
         static("/static/images/endingArt") {
-            resources("/static/images/endings")
+            files("static/images/endings")
         }
         static("/static/images/icons100/legacies") {
-            resources("/static/images/legacies")
+            files("static/images/legacies")
         }
         static("/static/images/icons100/verbs") {
-            resources("/static/images/verbs")
+            files("static/images/verbs")
         }
         install(StatusPages) {
             status(HttpStatusCode.NotFound) { call, _ ->
