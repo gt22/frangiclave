@@ -25,7 +25,7 @@ fun DIV.deck(x: Deck) = dataPage(x) {
             }
         }
     }
-    field("Cards: ") { elementList(x.spec.asSequence().map { it to 1 }.toMap()) }
+    field("Cards: ") { elementList(x.spec.groupingBy { it }.eachCount()) }
     field("Default card: ") { if(x.defaultcard.isNotBlank()) elementRef(x.defaultcard, "1") else em { +"None" } }
     field("Reset on Exhaustion? ") { bool(x.resetonexhaustion)}
     field("For legacy family: ") { if(x.forlegacyfamily.isNotBlank()) +x.forlegacyfamily else em { +"None" } }
