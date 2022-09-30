@@ -22,10 +22,7 @@ repositories {
     mavenCentral()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers") }
-    maven {
-        url = uri("http://52.48.142.75/maven")
-        isAllowInsecureProtocol = true
-    }
+    maven { url = uri("https://uadaf.theevilroot.xyz/maven") }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
