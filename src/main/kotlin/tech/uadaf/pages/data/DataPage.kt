@@ -47,12 +47,20 @@ fun DIV.dataPage(data: Data, content: DIV.() -> Unit) = div {
         }
         +data.id
     }
+    if(data is Element && data.manifestationtype != "") {
+        manifest(data)
+    } else {
+        dataImage(data)
+    }
+    content()
+}
+
+fun DIV.dataImage(data: Data) {
     forData(data)?.let { image ->
-        img("Icon", image, "content-image image-${type.lowercase()}") {
+        img("Icon", image, "content-image image-${data.javaClass.simpleName.lowercase()}") {
             missingFor(data)?.let { x ->
                 onError = "this.src='$x'"
             }
         }
     }
-    content()
 }

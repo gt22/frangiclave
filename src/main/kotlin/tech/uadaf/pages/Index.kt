@@ -1,7 +1,7 @@
 package tech.uadaf.pages
 
 import kotlinx.html.*
-import tech.uadaf.csdata.element
+import tech.uadaf.csdata.frangiclave
 
 private const val description =
     "Welcome, friend, to the Frangiclave Compendium, the premier source of forbidden knowledge for the discerning occultist."
@@ -16,18 +16,18 @@ fun HTML.index() = basePage(head = {
         meta("og:description", desc)
         meta("twitter:description", desc)
     }
-    element("toolknockf").let {
+    frangiclave("toolknockf").let {
         meta("twitter:image", it)
         meta("og:image", it)
     }
 }) {
-    img("frangiclave", element("toolknockf")) { id = "logo" }
+    img("frangiclave", frangiclave("toolknockf")) { id = "logo" }
     p {
         id = "tagline"
         +description
     }
     p {
-        +"The Frangiclave Compendium is an open-source repository for information about the contents of the game Cultist Simulator, as extracted from the game's files. Here you can browse the decks, elements, legacies, recipes and verbs included in the game. All DLC content is also included."
+        +"The Frangiclave Compendium (Curia edition) is an open-source repository for information about the contents of the game Book of Hours beta version Curia, as extracted from the game's files. Here you can browse the decks, elements, legacies, recipes and verbs included in the game."
     }
     div {
         p("index-foot") {

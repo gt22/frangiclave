@@ -1,13 +1,12 @@
 package tech.uadaf.csdata
 
 import dawnbreaker.data.raw.*
+import io.ktor.http.*
 import tech.uadaf.baseUrl
 
-fun page(type: String, id: String) = "$baseUrl/$type/$id"
+fun page(type: String, id: String) = "$baseUrl/$type/${id.encodeURLPath()}"
 
 fun deckPage(id: String) = page("deck", id)
-
-fun aspectPage(id: String) = page("element", id)
 
 fun elementPage(id: String) = page("element", id)
 

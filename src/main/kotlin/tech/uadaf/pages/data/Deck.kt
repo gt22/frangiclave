@@ -16,7 +16,7 @@ fun DIV.deck(x: Deck) = dataPage(x) {
             em { +"None" }
         } else {
             ul {
-                x.drawmessages.forEach { (id, msg) ->
+                x.drawmessages.forEach { (id, _) ->
                     li {
                         elementRef(id)
                         localizations(x) { s: DeckLocale -> s.drawmessages[id] ?: "None" }

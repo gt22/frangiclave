@@ -4,5 +4,6 @@ build/
 .idea
 out/
 content_norm
+content_boh
 src/main/resources/static/images
 static

@@ -4,8 +4,8 @@ val logback_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.6.20"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
+    kotlin("jvm") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
@@ -37,7 +37,7 @@ val jar by tasks.getting(Jar::class) {
 
 dependencies {
     implementation("org.fusesource.jansi:jansi:2.4.0")
-    implementation("com.frgm:dawnbreaker:0.1.5.2")
+    implementation("com.frgm:dawnbreaker:0.1.7.2")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-host-common-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktor_version")

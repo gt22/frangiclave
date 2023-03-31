@@ -1,16 +1,38 @@
 package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Element
+import dawnbreaker.locale.data.DeckLocale
 import dawnbreaker.locale.data.ElementLocale
-import kotlinx.html.DIV
-import kotlinx.html.br
-import kotlinx.html.em
+import kotlinx.html.*
 import tech.uadaf.content
+import tech.uadaf.csdata.*
 import tech.uadaf.pages.*
 
 fun DIV.element(x: Element) = dataPage(x) {
-    field("Label: ") { localizations(x) { e : ElementLocale -> e.label } }
-    field("Description: ") { localizations(x) { e : ElementLocale -> e.description } }
+    field("Label: ") { localizations(x) { e: ElementLocale -> e.label } }
+    field("Description: ") { localizations(x) { e: ElementLocale -> e.description } }
+    field("Cross texts: ") {
+        if (x.xexts.isEmpty()) {
+            em { +"None" }
+        } else {
+            ul {
+                x.xexts.forEach { (id, _) ->
+                    li {
+                        elementRef(id)
+                        localizations(x) { s: ElementLocale -> s.xexts[id] ?: "None" }
+                    }
+                }
+            }
+        }
+    }
+    field("Inherits: ") {
+        if (x.inherits.isNotBlank()) {
+            elementRef(x.inherits)
+        } else {
+            +"None"
+        }
+    }
+    field("Inherited by: ") { elementList(content.elements.filter { it.inherits == x.id }.associate { it.id to 1 }) }
     field("Aspects: ") { elementList(x.aspects) }
     field("Induces: ") {
         if (x.induces.isEmpty()) {
@@ -26,6 +48,7 @@ fun DIV.element(x: Element) = dataPage(x) {
         }
     }
     field("Slots: ") { slots(*x.slots.toTypedArray()) }
+    field("Commute: ") { elementList(x.commute.associateWith { 1 }) }
     field("Triggered by: ") { xtriggers(x.xtriggers) }
     field("Triggered from: ") {
         val triggers = content.elements.asSequence()
@@ -72,7 +95,25 @@ fun DIV.element(x: Element) = dataPage(x) {
         val recipes = content.recipes.asSequence()
             .filter { it.effects.contains(x.id) }
             .map { it.id to it.effects[x.id]!! }
-            .plus(content.recipes.asSequence().filter { it.aspects.contains(x.id) }.map { it.id to it.aspects[x.id].toString() })
+            .plus(content.recipes.asSequence().filter { it.aspects.contains(x.id) }
+                .map { it.id to it.aspects[x.id].toString() })
+            .sortedBy { it.first }
+            .toMap()
+        recipeList(recipes)
+    }
+    field("Referenced in Recipes: ") {
+        val recipes = content.recipes.asSequence()
+            .filter {
+                sequenceOf(
+                    it.mutations.asSequence().flatMap { m -> sequenceOf(m.filter, m.mutate, m.level) },
+                    it.requirements.values.asSequence(),
+                    it.extantreqs.values.asSequence(),
+                    it.tablereqs.values.asSequence(),
+                    it.deckeffects.values.asSequence(),
+                    it.effects.values.asSequence()
+                ).flatten().any { e -> e == x.id }
+            }
+            .map { it.id to "" }
             .sortedBy { it.first }
             .toMap()
         recipeList(recipes)
@@ -90,8 +131,9 @@ fun DIV.element(x: Element) = dataPage(x) {
     }
     field("Aspect? ") {
         bool(x.isAspect)
-        val elements = content.elements.filter { it.aspects.contains(x.id) }.sortedBy { it.id }.associate { it.id to it.aspects[x.id]!! }
-        if(elements.isNotEmpty()) {
+        val elements = content.elements.filter { it.aspects.contains(x.id) }.sortedBy { it.id }
+            .associate { it.id to it.aspects[x.id]!! }
+        if (elements.isNotEmpty()) {
             br { }
             elementList(elements)
         }
@@ -100,6 +142,7 @@ fun DIV.element(x: Element) = dataPage(x) {
     field("Uniqueness Group: ") { str(x.uniquenessgroup) }
     field("Hidden? ") { bool(x.isHidden) }
     field("No Art Needed? ") { bool(x.noartneeded) }
+    field("Manifestation type: ") { str(x.manifestationtype) }
     field("Resaturate? ") { bool(x.resaturate) }
     field("Override Verb Icon: ") { str(x.verbicon) }
     field("In Decks: ") {
@@ -110,4 +153,44 @@ fun DIV.element(x: Element) = dataPage(x) {
         deckList(decks)
     }
     field("Comments: ") { str(x.comments) }
+}
+
+fun DIV.manifest(x: Element) {
+    if(x.noartneeded) return
+    when (x.manifestationtype.lowercase()) {
+        "book" -> img(
+            "Icon", book(x.id),
+            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-book"
+        ) {
+            book("_x").let { x ->
+                onError = "this.src='$x'"
+            }
+        }
+        "thing" -> img(
+            "Icon", thing(x.id),
+            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-thing"
+        ) {
+            thing("_x").let { x ->
+                onError = "this.src='$x'"
+            }
+        }
+        "comfort" -> img(
+            "Icon", comfort(x.id),
+            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-comfort"
+        ) {
+            aspect("_x").let { x ->
+                onError = "this.src='$x'"
+            }
+        }
+        "wallart" -> img(
+            "Icon", wallart(x.id),
+            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-wallart"
+        ) {
+            aspect("_x").let { x ->
+                onError = "this.src='$x'"
+            }
+        }
+
+        else -> dataImage(x)
+    }
 }

@@ -57,18 +57,29 @@ fun FlowContent.str(x: String) {
 fun <T : Data, L : LocaleData<T>> localizeInline(x: T, get: (L) -> String) =
     locales.joinToString("$$") { runCatching { get(it[x] as L) }.getOrElse { "" } }
 
-fun FlowContent.elementRef(id: String, amount: String = "1") = a(aspectPage(id), classes = "element-ref ref") {
-    val aspect = content.lookup<Element>(id)
-    if (aspect != null) {
-        title = localizeInline(aspect) { a: ElementLocale -> a.label }
+fun FlowContent.elementRef(id: String, amount: String = "1") = a(elementPage(id), classes = "element-ref ref") {
+    val element = content.lookup<Element>(id)
+    if (element != null) {
+        title = localizeInline(element) { a: ElementLocale -> a.label }
     }
     if (amount != "1") {
         span("element-ref ref-text ref-amount") { +amount }
     }
-    img(id, if (aspect != null) forData(aspect) else aspect("_x"), classes = "element-ref ref-icon") {
-        onError = "this.src='${if (aspect != null) missingFor(aspect) else aspect("_x")}'"
+    img(id, if (element != null) elementRefIcon(element) else aspect("_x"), classes = "element-ref ref-icon") {
+        onError = "this.src='${if (element != null) missingFor(element) else aspect("_x")}'"
     }
     span("element-ref ref-text ref-id") { +id }
+}
+
+fun elementRefIcon(element: Element): String? {
+    if(element.noartneeded) return aspect("_x")
+    return when(element.manifestationtype.lowercase()) {
+        "book" -> aspect("readable")
+        "thing" -> aspect("thing")
+        "comfort" -> aspect("comfort")
+        "wallart" -> aspect("wallart")
+        else -> forData(element)
+    }
 }
 
 fun FlowContent.verbRef(id: String, amount: String = "1") = a(verbPage(id), classes = "verb-ref ref") {
@@ -112,7 +123,7 @@ fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<Stri
         if (amount.isNotBlank()) {
             span("recipe-ref ref-text ref-amount") { +amount }
         }
-        img(id, aspect("ritual"), classes = "recipe-ref ref-icon") {}
+        img(id, frangiclave("ritual"), classes = "recipe-ref ref-icon") {}
         span("recipe-ref ref-text ref-id") { +id }
         challenges.forEach {
             img("Challenge: $it", aspect(it), classes = "recipe-ref ref-challenge") {
@@ -142,7 +153,7 @@ fun FlowContent.deckRef(id: String, amount: String = "1") = a(deckPage(id), clas
     if (amount != "1") {
         span("deck-ref ref-text ref-amount") { +amount }
     }
-    img(id, aspect("library"), classes = "deck-ref ref-icon") {}
+    img(id, frangiclave("library"), classes = "deck-ref ref-icon") {}
     span("deck-ref ref-text ref-id") { +id }
 }
 
@@ -199,7 +210,7 @@ fun FlowContent.trggeredFromList(triggers: List<Pair<String, String>>) {
 fun FlowContent.mutation(x: Mutation) {
     elementRef(x.filter)
     +" -> "
-    elementRef(x.mutate, if (x.additive && x.level > 0) "+${x.level}" else x.level.toString())
+    elementRef(x.mutate, if (x.additive && (x.level.isNotBlank() && x.level != "0")) "+${x.level}" else x.level)
 }
 
 fun FlowContent.mutations(x: List<Mutation>) {
@@ -220,12 +231,12 @@ fun FlowContent.portalRef(id: String) = a(portalPage(id), classes = "portal-ref 
 }
 
 fun FlowContent.endingRef(id: String) = a(endingPage(id), classes = "ending-ref ref") {
-    img(id, aspect("winter"), classes = "ending-ref ref-icon") {}
+    img(id, frangiclave("winter"), classes = "ending-ref ref-icon") {}
     span("ending-ref ref-text ref-id") { +id }
 }
 
 fun FlowContent.legacyRef(id: String) = a(legacyPage(id), classes = "legacy-ref ref") {
-    img(id, aspect("grail"), classes = "legacy-ref ref-icon") {}
+    img(id, frangiclave("grail"), classes = "legacy-ref ref-icon") {}
     span("legacy-ref ref-text ref-id") { +id }
 }
 
@@ -259,6 +270,7 @@ fun UL.slot(x: Slot) = li {
     subfield("Forbidden: ") { elementList(x.forbidden) }
     subfield("Greedy? ") { bool(x.greedy) }
     subfield("Consumes? ") { bool(x.consumes) }
+    subfield("If aspects present: ") { elementList(x.ifaspectspresent) }
 }
 
 fun FlowContent.slots(vararg slots: Slot) {

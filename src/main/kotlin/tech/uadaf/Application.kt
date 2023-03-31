@@ -31,17 +31,19 @@ lateinit var content: Mod
 val locales: MutableList<Locale> = mutableListOf()
 
 private fun loadLocale(name: String) {
-    locales.add(Locale.load(name, vanilla, Paths.get(config.contentDir).resolve("loc_$name")))
+    locales.add(Locale.load(name, content, Paths.get(config.contentDir).resolve("loc_$name")))
 }
 
 private fun prepareContent() {
     loadVanilla(Path.of(config.contentDir))
     content = vanilla
+    content.applyInherits()
     content.sources["temporary_verbs"] = SourceBuilder().apply {
         verbs {
             content.recipes.asSequence()
                 .map { it.actionid }
                 .filter { it.isNotBlank() }
+                .filterNot { it.endsWith('*') }
                 .filter { content.lookup<Verb>(it) == null }
                 .distinct()
                 .forEach {
@@ -53,9 +55,10 @@ private fun prepareContent() {
         recipes {
             content.recipes.asSequence().flatMap {
                 it.alt.asSequence().plus(it.linked.asSequence())
-            }.filter { content.lookup<Recipe>(it.id) == null }.forEach {
-                +it
-            }
+            }.filterNot { it.id.endsWith('*') }
+                .filter { content.lookup<Recipe>(it.id) == null }.forEach {
+                    +it
+                }
         }
     }.t
     content.sources["internal_decks"] = SourceBuilder().apply {
@@ -67,10 +70,10 @@ private fun prepareContent() {
         }
     }.t
     loadLocale("en")
-    loadLocale("ru")
-    loadLocale("zh-hans")
-    loadLocale("de")
-    loadLocale("jp")
+//    loadLocale("ru")
+//    loadLocale("zh-hans")
+//    loadLocale("de")
+//    loadLocale("jp")
 }
 
 fun main() {

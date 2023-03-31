@@ -3,9 +3,19 @@ package tech.uadaf.csdata
 import dawnbreaker.data.raw.*
 import tech.uadaf.baseUrl
 
-fun image(path: String) = "$baseUrl/static/images/${path.removePrefix("/").removeSuffix(".png")}.png"
+fun image(path: String, space: String ="bhimages") = "$baseUrl/static/$space/${path.removePrefix("/").removeSuffix(".png")}.png"
 
 fun element(icon: String) = image("elements/$icon")
+
+fun book(icon: String) = image("books/$icon")
+
+fun bookspine(icon: String) = image("books/${icon}_")
+
+fun thing(icon: String) = image("things/$icon")
+
+fun comfort(icon: String) = image("comforts/$icon")
+
+fun wallart(icon: String) = image("wallart/$icon")
 
 fun aspect(icon: String) = image("aspects/$icon")
 
@@ -17,6 +27,8 @@ fun legacy(icon: String) = image("legacies/$icon")
 
 fun verb(icon: String) = image("verbs/$icon")
 
+fun frangiclave(icon: String) = image("frangiclave/$icon", "images")
+
 private fun tryIcon(icon: String, id: String) = icon.ifBlank { id }
 
 fun missingFor(x: Data) = when(x) {
@@ -26,7 +38,11 @@ fun missingFor(x: Data) = when(x) {
 }
 
 fun forData(x: Data) = when(x) {
-        is Element -> if(x.isAspect) aspect(tryIcon(x.icon, x.id)) else element(tryIcon(x.icon, x.id))
+        is Element -> when {
+            x.noartneeded -> null
+            x.isAspect -> aspect(tryIcon(x.icon, x.id))
+            else -> element(tryIcon(x.icon, x.id))
+        }
         is Ending -> ending(x.image)
         is Legacy -> legacy(x.image)
         is Verb -> verb(tryIcon(x.icon, x.id))

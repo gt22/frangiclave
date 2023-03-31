@@ -28,7 +28,7 @@ fun HTML.basePage(
         }
         inlinedThemeScript()
         link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Forum|Lato")
-        link(rel = "icon", type = "image/png", href = aspect("knock"))
+        link(rel = "icon", type = "image/png", href = frangiclave("knock"))
         script {
             defer = true
             src = "$baseUrl/static/script/sidebar.js"
@@ -61,16 +61,16 @@ fun FlowContent.lightswitchRef(id: String, text: String, icon: String) = a("#", 
 
 fun BODY.header(keywords: String) = header {
     a("$baseUrl/") {
-        img("knock", aspect("knock"))
-        h1 { +"Frangiclave" }
+        img("knock", frangiclave("knock"))
+        h1 { +"BoHClave: Beta Curia" }
     }
     div {
         id = "switchbox"
         div {
             id = "lightswitch"
-            lightswitchRef("lightswitch-auto", "Auto", aspect("colours.liminal"))
-            lightswitchRef("lightswitch-light", "Light", aspect("colours.splendid"))
-            lightswitchRef("lightswitch-dark", "Dark", aspect("colours.honeyed"))
+            lightswitchRef("lightswitch-auto", "Auto", frangiclave("colours.liminal"))
+            lightswitchRef("lightswitch-light", "Light", frangiclave("colours.splendid"))
+            lightswitchRef("lightswitch-dark", "Dark", frangiclave("colours.honeyed"))
         }
     }
     form {
