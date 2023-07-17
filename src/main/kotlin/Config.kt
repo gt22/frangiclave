@@ -6,5 +6,6 @@ data class Config(
     val port: Int,
     val baseUrl: String,
     val contentDir: String,
+    val version: String,
     val isDebug: Boolean = false
 )

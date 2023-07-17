@@ -5,7 +5,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.html.DIV
@@ -17,6 +17,7 @@ import tech.uadaf.pages.basePage
 import tech.uadaf.pages.data.*
 import tech.uadaf.pages.index
 import tech.uadaf.pages.search
+import java.io.File
 
 inline fun <reified T : Data> Routing.dataPage(type: String, crossinline page : DIV.(T) -> Unit) = get("/$type/{id}") {
     val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.NotFound)
@@ -47,43 +48,27 @@ fun Application.configureRouting() {
         dataPage<Dicta>("dicta") { dicta(it) }
         dataPage<Portal>("portal") { portal(it) }
 
-        // Static plugin. Try to access `/static/index.html`
-        static("/static") {
-            resources("static")
-        }
-        static("/static") {
-            files("static")
-        }
+
+        staticResources("/static", "static")
+        staticFiles("/static", File("static"))
         // Backwards compatibility with old FC:
-        static("/static/images/icons40/aspects") {
-            files("static/images/aspects")
-        }
-        static("/static/images/burnImages") {
-            files("static/images/burnimages")
-        }
-        static("/static/images/elementArt") {
-            files("static/images/elements")
-        }
-        static("/static/images/endingArt") {
-            files("static/images/endings")
-        }
-        static("/static/images/icons100/legacies") {
-            files("static/images/legacies")
-        }
-        static("/static/images/icons100/verbs") {
-            files("static/images/verbs")
-        }
-        install(StatusPages) {
-            status(HttpStatusCode.NotFound) { call, _ ->
-                call.respondHtml(HttpStatusCode.NotFound) {
-                    basePage("") {
-                        h2 {
-                            id = "content-title"
-                            +"Nothing?"
-                        }
-                        p {
-                            +"Nothing"
-                        }
+        staticFiles("/static/images/icons40/aspects", File("static/images/aspects"))
+        staticFiles("/static/images/burnImages", File("static/images/burnimages"))
+        staticFiles("/static/images/elementArt", File("static/images/elements"))
+        staticFiles("/static/images/endingArt", File("static/images/endings"))
+        staticFiles("/static/images/icons100/legacies", File("static/images/legacies"))
+        staticFiles("/static/images/icons100/verbs", File("static/images/verbs"))
+    }
+    install(StatusPages) {
+        status(HttpStatusCode.NotFound) { call, _ ->
+            call.respondHtml(HttpStatusCode.NotFound) {
+                basePage("") {
+                    h2 {
+                        id = "content-title"
+                        +"Nothing?"
+                    }
+                    p {
+                        +"Nothing"
                     }
                 }
             }

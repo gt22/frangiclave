@@ -158,39 +158,22 @@ fun DIV.element(x: Element) = dataPage(x) {
 fun DIV.manifest(x: Element) {
     if(x.noartneeded) return
     when (x.manifestationtype.lowercase()) {
-        "book" -> img(
-            "Icon", book(x.id),
-            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-book"
-        ) {
-            book("_x").let { x ->
-                onError = "this.src='$x'"
-            }
-        }
-        "thing" -> img(
-            "Icon", thing(x.id),
-            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-thing"
-        ) {
-            thing("_x").let { x ->
-                onError = "this.src='$x'"
-            }
-        }
-        "comfort" -> img(
-            "Icon", comfort(x.id),
-            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-comfort"
-        ) {
-            aspect("_x").let { x ->
-                onError = "this.src='$x'"
-            }
-        }
-        "wallart" -> img(
-            "Icon", wallart(x.id),
-            "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-wallart"
-        ) {
-            aspect("_x").let { x ->
-                onError = "this.src='$x'"
-            }
-        }
-
+        "book" -> manifestImage(x, ::book)
+        "thing" -> manifestImage(x, ::thing)
+        "comfort" -> manifestImage(x, ::comfort)
+        "wallart" -> manifestImage(x, ::wallart)
+        "candle" -> manifestImage(x, ::candle)
         else -> dataImage(x)
+    }
+}
+
+fun DIV.manifestImage(x: Element, src: (String) -> String) {
+    img(
+        "Icon", src(x.id),
+        "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-${x.manifestationtype}"
+    ) {
+        aspect("_x").let { x ->
+            onError = "this.src='$x'"
+        }
     }
 }

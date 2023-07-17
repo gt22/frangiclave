@@ -78,6 +78,7 @@ fun elementRefIcon(element: Element): String? {
         "thing" -> aspect("thing")
         "comfort" -> aspect("comfort")
         "wallart" -> aspect("wallart")
+        "candle" -> aspect("fuel") //TODO: Change to candle when it gets the image
         else -> forData(element)
     }
 }

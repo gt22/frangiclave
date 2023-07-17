@@ -1,6 +1,7 @@
 package tech.uadaf.pages
 
 import kotlinx.html.*
+import tech.uadaf.config
 import tech.uadaf.csdata.frangiclave
 
 private const val description =
@@ -28,6 +29,9 @@ fun HTML.index() = basePage(head = {
     }
     p {
         +"The Frangiclave Compendium (Curia edition) is an open-source repository for information about the contents of the game Book of Hours beta version Curia, as extracted from the game's files. Here you can browse the decks, elements, legacies, recipes and verbs included in the game."
+    }
+    p {
+        +"Data taken from: ${config.version}"
     }
     div {
         p("index-foot") {

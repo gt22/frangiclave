@@ -57,7 +57,7 @@ fun DIV.dataPage(data: Data, content: DIV.() -> Unit) = div {
 
 fun DIV.dataImage(data: Data) {
     forData(data)?.let { image ->
-        img("Icon", image, "content-image image-${data.javaClass.simpleName.lowercase()}") {
+        img("Icon", image, "content-image image-${data.javaClass.simpleName.lowercase()} manifestation-empty") {
             missingFor(data)?.let { x ->
                 onError = "this.src='$x'"
             }

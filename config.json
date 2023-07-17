@@ -3,5 +3,6 @@
   "port": 8080,
   "baseUrl": "",
   "contentDir": "bhcontent_norm",
+  "version": "Book Of Hours: Nocturnal Beta",
   "isDebug": true
 }

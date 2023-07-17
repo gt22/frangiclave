@@ -15,7 +15,9 @@ fun thing(icon: String) = image("things/$icon")
 
 fun comfort(icon: String) = image("comforts/$icon")
 
-fun wallart(icon: String) = image("wallart/$icon")
+fun wallart(icon: String) = image("wallarts/$icon")
+
+fun candle(icon: String) = image("candles/$icon")
 
 fun aspect(icon: String) = image("aspects/$icon")
 

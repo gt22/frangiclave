@@ -51,7 +51,7 @@ private fun find(kw: String): Sequence<Pair<Data, List<String>>> = sequence {
             yield(label)
             yield(description)
             yield(comments)
-            drawmessages.forEach { (_, v) -> yield(v) }
+            yieldAll(drawmessages.values)
         }
     })
     yieldAll(find(kw, content.elements) {
@@ -61,6 +61,7 @@ private fun find(kw: String): Sequence<Pair<Data, List<String>>> = sequence {
             yield(description)
             yield(uniquenessgroup)
             yield(comments)
+            yieldAll(xexts.values)
         }
     })
     yieldAll(find(kw, content.endings) {
@@ -104,7 +105,7 @@ private fun find(kw: String): Sequence<Pair<Data, List<String>>> = sequence {
             yield(otherworldId)
             yield(egressId)
             yield(description)
-            consequences.forEach { yield(it.toPath) }
+            yieldAll(consequences.map { it.toPath })
         }
     })
 }
