@@ -1,0 +1,33 @@
+#index-list
+  border-collapse: collapse
+  .index-icon
+    width: 30px
+    height: 30px
+    vertical-align: baseline
+
+  tr
+    border: var(--sidebar-border) 1px solid
+
+  tbody
+    //:nth-child(odd of tr)
+    //  background-color: var(--content-background-secondary)
+    &.skills
+      :nth-child(odd of tr)
+        background-color: inherit
+      :nth-child(4n of tr), :nth-child(4n-1 of tr)
+        background-color: var(--content-background-secondary)
+
+  td
+    border-right: var(--sidebar-border) 1px solid
+
+  text-align: center
+
+  .index-powers
+    max-width: 200px
+    text-align: left
+
+  .index-things, .index-craft
+    .index-image
+      .content-image
+        max-width: 150px
+        max-height: 150px

@@ -1,18 +1,19 @@
 @mixin header-lighttheme
-  --search-submit-background: linear-gradient(#924cb7, #603888)
+  --search-submit-background: linear-gradient(#6290a1, #46798a)
   --search-submit-color: #ece0ec
-  --header-title-color: #331544
+  --search-shadow: #47707e
+  --header-title-color: #427b91
   --header-title-shadow: 2px 2px 3px rgb(255 255 255 / 10%)
 
 @mixin sidebar-lighttheme
-  --section-background: linear-gradient(to right, #decede, #ffffff)
-  --section-title-background: linear-gradient(to right, #937398, #ab80ab)
-  --sidebar-shadow: #906da5
-  --sidebar-border: #594a5a
+  --section-background: linear-gradient(to right, #b3e3f8, #ffffff)
+  --section-title-background: linear-gradient(to right, #89b7c9, #9acde1)
+  --sidebar-shadow: #52808c
+  --sidebar-border: #3d616b
   --section-title-color: white
   --section-file-color: #696969
-  --section-item-color: #233844
-  --section-active-item-background: #cfb8d0
+  --section-item-color: #124c5d
+  --section-active-item-background: #6399b2
 
 @mixin ref-lighttheme
   --ref-background: #4e8fc3
@@ -21,8 +22,9 @@
 
 @mixin content-lightheme
   --content-background-color: white
-  --content-title-prefix-color: #6d556f
-  --content-link-hover-color: #714172
+  --content-background-secondary: #d7d7d7
+  --content-title-prefix-color: #77aad3
+  --content-title-border: #77aad3
 
 @mixin search-lighttheme
   --search-result-brackground: #fffaff
@@ -30,18 +32,24 @@
 @mixin footer-lighttheme
   --footer-shade: #a7a99d
 
+@mixin index-darktheme
+  --index-logo-shadow: #5b849a
+
 @mixin lighttheme
   --background-color: #ded1b4
   --text-color: #233844
   --positive-color: white
   --negative-color: black
-  --purple-background: #b956f4
+  --main-background: #89b7c9
+  --link-color: #0000ee
+  --visited-link-color: #6407bd
   @include header-lighttheme
   @include sidebar-lighttheme
   @include ref-lighttheme
   @include content-lightheme
   @include search-lighttheme
   @include footer-lighttheme
+  @include index-darktheme
 
 body
   @include lighttheme

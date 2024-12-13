@@ -1,6 +1,6 @@
 package tech.uadaf.pages.data
 
-import dawnbreaker.data.raw.Dicta
+import dawnbreaker.data.raw.primary.Dicta
 import kotlinx.html.DIV
 import tech.uadaf.pages.elementRef
 import tech.uadaf.pages.field

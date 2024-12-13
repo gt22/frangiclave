@@ -1,10 +1,9 @@
 package tech.uadaf.pages.data
 
-import dawnbreaker.data.raw.*
+import dawnbreaker.data.raw.Data
+import dawnbreaker.data.raw.primary.*
 import kotlinx.html.*
-import tech.uadaf.csdata.element
-import tech.uadaf.csdata.forData
-import tech.uadaf.csdata.missingFor
+import tech.uadaf.csdata.*
 
 private fun description(data: Data) = when(data) {
     is Element -> data.description
@@ -35,7 +34,7 @@ fun HEAD.dataHead(data: Data) {
     }
 }
 
-fun DIV.dataPage(data: Data, content: DIV.() -> Unit) = div {
+fun DIV.dataPage(data: Data, copyText: String? = null, content: DIV.() -> Unit) = div {
     val type = data.javaClass.simpleName
     id = "data-page"
     h2 {
@@ -46,6 +45,13 @@ fun DIV.dataPage(data: Data, content: DIV.() -> Unit) = div {
             +": "
         }
         +data.id
+        if(copyText != null) {
+            div(classes = "copy-button data-copy ref") {
+                attributes["data-clipboard-text"] = copyText
+                img("", frangiclave("codex"), classes = "ref-icon") {}
+                span("ref-text ref-id") { +"Copy" }
+            }
+        }
     }
     if(data is Element && data.manifestationtype != "") {
         manifest(data)
@@ -55,9 +61,9 @@ fun DIV.dataPage(data: Data, content: DIV.() -> Unit) = div {
     content()
 }
 
-fun DIV.dataImage(data: Data) {
+fun FlowContent.dataImage(data: Data) {
     forData(data)?.let { image ->
-        img("Icon", image, "content-image image-${data.javaClass.simpleName.lowercase()} manifestation-empty") {
+        img("Icon", image, classes = "content-image image-${data.javaClass.simpleName.lowercase()} manifestation-empty") {
             missingFor(data)?.let { x ->
                 onError = "this.src='$x'"
             }

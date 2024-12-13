@@ -1,6 +1,6 @@
 package tech.uadaf.pages.data
 
-import dawnbreaker.data.raw.Element
+import dawnbreaker.data.raw.primary.Element
 import dawnbreaker.locale.data.DeckLocale
 import dawnbreaker.locale.data.ElementLocale
 import kotlinx.html.*
@@ -8,7 +8,7 @@ import tech.uadaf.content
 import tech.uadaf.csdata.*
 import tech.uadaf.pages.*
 
-fun DIV.element(x: Element) = dataPage(x) {
+fun DIV.element(x: Element) = dataPage(x, x.textContent()) {
     field("Label: ") { localizations(x) { e: ElementLocale -> e.label } }
     field("Description: ") { localizations(x) { e: ElementLocale -> e.description } }
     field("Cross texts: ") {
@@ -72,6 +72,29 @@ fun DIV.element(x: Element) = dataPage(x) {
             }.toMap()
         xtriggers(triggers)
     }
+    field("Imms: ") { imms(x.imms) }
+    field("Imms from: ") {
+        val imms = content.elements.asSequence()
+            .flatMap { source ->
+                source.imms.asSequence()
+                    .filter { x.id in it.effects }
+                    .map { it.req to (source.id to it.effects[x.id]!!) }
+            }.sortedBy { it.first.first }
+            .toList()
+        immsOn(imms)
+    }
+    field("Imms on: ") {
+        val imms = content.elements.asSequence()
+            .flatMap { source ->
+                source.imms.asSequence()
+                    .filter { x.id == it.req.first }
+                    .flatMap { imm ->
+                        imm.effects.asSequence().map { (k, v) -> (source.id to "1") to (k to v) }
+                    }
+            }
+            .toList()
+        immsOn(imms)
+    }
     field("Requirements for Recipes: ") {
         val recipes = content.recipes.asSequence()
             .flatMap {
@@ -97,15 +120,46 @@ fun DIV.element(x: Element) = dataPage(x) {
             .map { it.id to it.effects[x.id]!! }
             .plus(content.recipes.asSequence().filter { it.aspects.contains(x.id) }
                 .map { it.id to it.aspects[x.id].toString() })
+            .plus(content.recipes.asSequence().filter { it.xpans.contains(x.id) }
+                .map { it.id to it.xpans[x.id].toString() })
             .sortedBy { it.first }
             .toMap()
         recipeList(recipes)
+    }
+    field("Mutated by: ") {
+        val mutations = content.recipes.flatMap { it.mutations.filter { m -> m.mutate == x.id }.map { m -> it to m } }
+        if (mutations.isNotEmpty()) {
+            mutations.forEach { (r, m) ->
+                br { }
+                elementRef(m.filter, "1")
+                +" -> "
+                recipeRef(r.id, mutationLevel(m))
+            }
+        } else {
+            em { +"None" }
+        }
+    }
+    field("Mutated in: ") {
+        val mutations = content.recipes.flatMap {
+            it.mutations.filter { m -> m.filter == x.id || x.aspects.keys.any { a -> m.filter == a } }
+                .map { m -> it to m }
+        }
+        if (mutations.isNotEmpty()) {
+            mutations.forEach { (r, m) ->
+                br { }
+                elementRef(m.mutate, mutationLevel(m))
+                +" <- "
+                recipeRef(r.id)
+            }
+        } else {
+            em { +"None" }
+        }
     }
     field("Referenced in Recipes: ") {
         val recipes = content.recipes.asSequence()
             .filter {
                 sequenceOf(
-                    it.mutations.asSequence().flatMap { m -> sequenceOf(m.filter, m.mutate, m.level) },
+                    it.mutations.asSequence().map { m -> m.level },
                     it.requirements.values.asSequence(),
                     it.extantreqs.values.asSequence(),
                     it.tablereqs.values.asSequence(),
@@ -118,7 +172,7 @@ fun DIV.element(x: Element) = dataPage(x) {
             .toMap()
         recipeList(recipes)
     }
-    field("Lifetime: ") { if (x.lifetime != 0) +x.lifetime.toString() else em { +"None" } }
+    field("Lifetime: ") { if (x.lifetime > .0) +x.lifetime.toString() else em { +"None" } }
     field("Decay To: ") { if (x.decayTo.isNotBlank()) elementRef(x.decayTo, "1") else em { +"None" } }
     field("Burn To: ") { if (x.burnTo.isNotBlank()) elementRef(x.burnTo, "1") else em { +"None" } }
     field("Decay from: ") {
@@ -133,9 +187,15 @@ fun DIV.element(x: Element) = dataPage(x) {
         bool(x.isAspect)
         val elements = content.elements.filter { it.aspects.contains(x.id) }.sortedBy { it.id }
             .associate { it.id to it.aspects[x.id]!! }
+        val verbs = content.verbs.filter { it.aspects.contains(x.id) }.sortedBy { it.id }
+            .associate { it.id to it.aspects[x.id]!! }
         if (elements.isNotEmpty()) {
             br { }
             elementList(elements)
+        }
+        if (verbs.isNotEmpty()) {
+            br { }
+            verbList(verbs)
         }
     }
     field("Unique? ") { bool(x.unique) }
@@ -155,8 +215,14 @@ fun DIV.element(x: Element) = dataPage(x) {
     field("Comments: ") { str(x.comments) }
 }
 
-fun DIV.manifest(x: Element) {
-    if(x.noartneeded) return
+fun Element.textContent() = """
+    |$label
+    |$description
+    |
+    |${xexts.values.joinToString("\n\n")}
+""".trimMargin("|")
+
+fun FlowContent.manifest(x: Element) {
     when (x.manifestationtype.lowercase()) {
         "book" -> manifestImage(x, ::book)
         "thing" -> manifestImage(x, ::thing)
@@ -167,10 +233,10 @@ fun DIV.manifest(x: Element) {
     }
 }
 
-fun DIV.manifestImage(x: Element, src: (String) -> String) {
+fun FlowContent.manifestImage(x: Element, src: (String) -> String) {
     img(
         "Icon", src(x.id),
-        "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-${x.manifestationtype}"
+        classes = "content-image image-${x.javaClass.simpleName.lowercase()} manifestation-${x.manifestationtype}"
     ) {
         aspect("_x").let { x ->
             onError = "this.src='$x'"

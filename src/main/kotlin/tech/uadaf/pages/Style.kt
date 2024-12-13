@@ -1,5 +1,8 @@
 package tech.uadaf.pages
 
+import tech.uadaf.config
+import tech.uadaf.theme
+
 class Sass {
     val imported: MutableSet<String> = mutableSetOf()
     val importMatcher = "^\\s*@import\\s+\"?(.+?)\"?\\n?\$".toRegex()
@@ -8,7 +11,7 @@ class Sass {
         val dirPath = path.substringBeforeLast("/") + "/"
         val res = StringBuilder()
         javaClass.getResourceAsStream(path).use {
-            it.bufferedReader().lines().forEach { line ->
+            it.bufferedReader().lines().map { line -> line.replace("{theme}", theme.id) }.forEach { line ->
                 val match = importMatcher.matchEntire(line)
                 if(match != null) {
                     var targetPath = dirPath + match.groupValues[1]
@@ -31,8 +34,7 @@ class Sass {
             val data = prepareSass(path)
             sass.outputStream.use { it.write(data.toByteArray()) }
             sass.inputStream.bufferedReader().use {
-                val ret = it.readText()
-                return ret
+                return it.readText()
             }
         } finally {
             if (sass.isAlive) {
@@ -43,5 +45,5 @@ class Sass {
 }
 
 val stylesheet by lazy { Sass().convertSass("/style/index.sass") }
-val lighttheme by lazy { Sass().convertSass("/style/theme_light.sass") }
-val darktheme by lazy { Sass().convertSass("/style/theme_dark.sass") }
+val lighttheme by lazy { Sass().convertSass("/style/themes/${theme.id}/theme_light.sass") }
+val darktheme by lazy { Sass().convertSass("/style/themes/${theme.id}/theme_dark.sass") }

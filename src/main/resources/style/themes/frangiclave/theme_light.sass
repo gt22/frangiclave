@@ -1,0 +1,55 @@
+@mixin header-lighttheme
+  --search-submit-background: linear-gradient(#924cb7, #603888)
+  --search-submit-color: #ece0ec
+  --search-shadow: #4d1b6b
+  --header-title-color: #331544
+  --header-title-shadow: 2px 2px 3px rgb(255 255 255 / 10%)
+
+@mixin sidebar-lighttheme
+  --section-background: linear-gradient(to right, #decede, #ffffff)
+  --section-title-background: linear-gradient(to right, #937398, #ab80ab)
+  --sidebar-shadow: #906da5
+  --sidebar-border: #594a5a
+  --section-title-color: white
+  --section-file-color: #696969
+  --section-item-color: #233844
+  --section-active-item-background: #cfb8d0
+
+@mixin ref-lighttheme
+  --ref-background: #4e8fc3
+  --ref-active-background: #77aad3
+  --ref-color: #dbe5e6
+
+@mixin content-lightheme
+  --content-background-color: white
+  --content-background-secondary: #d7d7d7
+  --content-title-prefix-color: #6d556f
+  --content-title-borde: #6d556f
+
+@mixin search-lighttheme
+  --search-result-brackground: #fffaff
+
+@mixin footer-lighttheme
+  --footer-shade: #a7a99d
+
+@mixin index-darktheme
+  --index-logo-shadow: #7b258e
+
+@mixin lighttheme
+  --background-color: #ded1b4
+  --text-color: #233844
+  --positive-color: white
+  --negative-color: black
+  --main-background: #b956f4
+  --link-color: #0000ee
+  --visited-link-color: #6407bd
+  @include header-lighttheme
+  @include sidebar-lighttheme
+  @include ref-lighttheme
+  @include content-lightheme
+  @include search-lighttheme
+  @include footer-lighttheme
+  @include index-darktheme
+
+body
+  @include lighttheme

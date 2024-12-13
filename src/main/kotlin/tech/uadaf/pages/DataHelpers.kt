@@ -1,6 +1,8 @@
 package tech.uadaf.pages
 
-import dawnbreaker.data.raw.*
+import dawnbreaker.data.raw.Data
+import dawnbreaker.data.raw.primary.*
+import dawnbreaker.data.raw.secondary.*
 import dawnbreaker.locale.LocaleData
 import dawnbreaker.locale.data.ElementLocale
 import dawnbreaker.locale.data.RecipeLocale
@@ -28,6 +30,7 @@ fun FlowContent.subfield(name: String, content: SPAN.() -> Unit) = span("content
 @Suppress("UNCHECKED_CAST")
 fun <T : Data, L : LocaleData<T>> FlowContent.localizations(x: T, get: (L) -> String) {
     val base = runCatching { locales[0][x] as L }
+    println(base)
     if (base.map(get).getOrElse { "" }.isNotBlank()) {
         ul("localizations") {
             locales.forEach {
@@ -65,20 +68,19 @@ fun FlowContent.elementRef(id: String, amount: String = "1") = a(elementPage(id)
     if (amount != "1") {
         span("element-ref ref-text ref-amount") { +amount }
     }
-    img(id, if (element != null) elementRefIcon(element) else aspect("_x"), classes = "element-ref ref-icon") {
+    img("", if (element != null) elementRefIcon(element) else aspect("_x"), classes = "element-ref ref-icon") {
         onError = "this.src='${if (element != null) missingFor(element) else aspect("_x")}'"
     }
     span("element-ref ref-text ref-id") { +id }
 }
 
 fun elementRefIcon(element: Element): String? {
-    if(element.noartneeded) return aspect("_x")
-    return when(element.manifestationtype.lowercase()) {
+    return when (element.manifestationtype.lowercase()) {
         "book" -> aspect("readable")
         "thing" -> aspect("thing")
         "comfort" -> aspect("comfort")
         "wallart" -> aspect("wallart")
-        "candle" -> aspect("fuel") //TODO: Change to candle when it gets the image
+        "candle" -> aspect("candle")
         else -> forData(element)
     }
 }
@@ -91,7 +93,7 @@ fun FlowContent.verbRef(id: String, amount: String = "1") = a(verbPage(id), clas
     if (amount != "1") {
         span("verb-ref ref-text ref-amount") { +amount }
     }
-    img(id, if (verb != null) forData(verb) else verb(id), classes = "verb-ref ref-icon") {
+    img("", if (verb != null) forData(verb) else verb(id), classes = "verb-ref ref-icon") {
         onError = "this.src='${if (verb != null) missingFor(verb) else verb("_x")}'"
     }
     span("verb-ref ref-text ref-id") { +id }
@@ -115,7 +117,7 @@ fun FlowContent.elementListS(elements: Map<String, String>) = span("element-ref 
 
 fun FlowContent.elementList(elements: Map<String, Int>) = elementListS(elements.mapValues { it.value.toString() })
 
-fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<String> = emptyList()) =
+fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<String> = emptyList(), text: String = id) =
     a(recipePage(id), classes = "recipe-ref ref") {
         val recipe = content.lookup<Recipe>(id)
         if (recipe != null) {
@@ -124,8 +126,8 @@ fun FlowContent.recipeRef(id: String, amount: String = "", challenges: List<Stri
         if (amount.isNotBlank()) {
             span("recipe-ref ref-text ref-amount") { +amount }
         }
-        img(id, frangiclave("ritual"), classes = "recipe-ref ref-icon") {}
-        span("recipe-ref ref-text ref-id") { +id }
+        img("", frangiclave("ritual"), classes = "recipe-ref ref-icon") {}
+        span("recipe-ref ref-text ref-id") { +text }
         challenges.forEach {
             img("Challenge: $it", aspect(it), classes = "recipe-ref ref-challenge") {
                 onError = "this.src='${aspect("_x")}'"
@@ -154,7 +156,7 @@ fun FlowContent.deckRef(id: String, amount: String = "1") = a(deckPage(id), clas
     if (amount != "1") {
         span("deck-ref ref-text ref-amount") { +amount }
     }
-    img(id, frangiclave("library"), classes = "deck-ref ref-icon") {}
+    img("", frangiclave("library"), classes = "deck-ref ref-icon") {}
     span("deck-ref ref-text ref-id") { +id }
 }
 
@@ -172,7 +174,7 @@ fun FlowContent.xtrigger(trigger: String, x: XTrigger) = span("xtrigger") {
     when (x.morpheffect.lowercase()) {
         "", "transform" -> elementRef(x.id)
         "spawn" -> elementRef(x.id, "Spawn ${x.level}")
-        "mutate" -> elementRef(x.id, "Mutate ${if (x.level > 0) "+${x.level}" else x.level.toString()}")
+        "mutate" -> elementRef(x.id, "Mutate ${mutationLevel(x)}")
     }
 }
 
@@ -208,10 +210,55 @@ fun FlowContent.trggeredFromList(triggers: List<Pair<String, String>>) {
     }
 }
 
+fun FlowContent.imm(req: Pair<String, String>, effect: Pair<String, String>) {
+    elementRef(req.first, req.second)
+    + " -> "
+    elementRef(effect.first, effect.second)
+}
+
+val Imm.req : Pair<String, String>
+    get() {
+        check(reqs.size == 1)
+        return reqs.entries.first().let { (k, v) -> k to v }
+    }
+
+fun FlowContent.imms(x: List<Imm>) {
+    if (x.isEmpty()) {
+        em { +"None" }
+    } else {
+        ul {
+            x.asSequence().sortedBy { it.req.first }.forEach { imm ->
+                imm.effects.asSequence().sortedBy { (k, _) -> k }.forEach { (k, v) ->
+                    li { imm(imm.req, k to v) }
+                }
+            }
+        }
+    }
+}
+
+fun FlowContent.immsOn(x: List<Pair<Pair<String, String>, Pair<String, String>>>) {
+    if (x.isEmpty()) {
+        em { +"None" }
+    } else {
+        ul {
+            x.asSequence().sortedBy { it.first.first }.forEach { (r, e) ->
+                li { imm(r, e) }
+            }
+        }
+    }
+}
+
+
+
+fun mutationLevel(level: String, additive: Boolean): String = if (additive && (level.isNotBlank() && level != "0" && level[0] != '-')) "+${level}" else level
+
+fun mutationLevel(x: Mutation): String = mutationLevel(x.level, x.additive)
+
+fun mutationLevel(x: XTrigger): String = mutationLevel(x.level.toString(), x.additive)
 fun FlowContent.mutation(x: Mutation) {
     elementRef(x.filter)
     +" -> "
-    elementRef(x.mutate, if (x.additive && (x.level.isNotBlank() && x.level != "0")) "+${x.level}" else x.level)
+    elementRef(x.mutate, mutationLevel(x))
 }
 
 fun FlowContent.mutations(x: List<Mutation>) {
@@ -226,32 +273,44 @@ fun FlowContent.mutations(x: List<Mutation>) {
     }
 }
 
+fun FlowContent.simpleRef(id: String, type: String, page: (String) -> String, icon: (String) -> String) = a(page(id), classes = "$type-ref ref") {
+    img("", icon(id), classes = "$type-ref ref-icon") {}
+    span("$type-ref ref-text ref-id") { +id }
+}
+
 fun FlowContent.portalRef(id: String) = a(portalPage(id), classes = "portal-ref ref") {
-    img(id, verb(id), classes = "portal-ref ref-icon") {}
+    img("", verb(id), classes = "portal-ref ref-icon") {}
     span("portal-ref ref-text ref-id") { +id }
 }
 
 fun FlowContent.endingRef(id: String) = a(endingPage(id), classes = "ending-ref ref") {
-    img(id, frangiclave("winter"), classes = "ending-ref ref-icon") {}
+    img("", frangiclave("winter"), classes = "ending-ref ref-icon") {}
     span("ending-ref ref-text ref-id") { +id }
 }
 
 fun FlowContent.legacyRef(id: String) = a(legacyPage(id), classes = "legacy-ref ref") {
-    img(id, frangiclave("grail"), classes = "legacy-ref ref-icon") {}
+    img("", frangiclave("grail"), classes = "legacy-ref ref-icon") {}
     span("legacy-ref ref-text ref-id") { +id }
 }
 
 fun FlowContent.cultureRef(id: String) = a(culturePage(id), classes = "culture-ref ref") {
-    img(id, element("scholarvak"), classes = "culture-ref ref-icon") {}
+    img("", element("scholarvak"), classes = "culture-ref ref-icon") {}
     span("culture-ref ref-text ref-id") { +id }
 }
 
 fun FlowContent.dictaRef(id: String) = a(dictaPage(id), classes = "dicta-ref ref") {
-    img(id, element("secrethistories"), classes = "dicta-ref ref-icon") {}
+    img("", element("secrethistories"), classes = "dicta-ref ref-icon") {}
     span("dicta-ref ref-text ref-id") { +id }
 }
 
+fun FlowContent.achievementRef(id: String) = simpleRef(id, "achievement", ::achievementPage) { element("trophy") }
+fun FlowContent.roomRef(id: String) = simpleRef(id, "room", ::roomPage) { aspect(content.lookup<Room>(id)?.period ?: "period.curia") }
+
+val Room.period: String
+    get() = aspects.keys.first()
+
 fun FlowContent.dataRef(x: Data) = when (x) {
+    is Achievement -> achievementRef(x.id)
     is Deck -> deckRef(x.id)
     is Element -> elementRef(x.id)
     is Ending -> endingRef(x.id)
@@ -261,25 +320,29 @@ fun FlowContent.dataRef(x: Data) = when (x) {
     is Culture -> cultureRef(x.id)
     is Dicta -> dictaRef(x.id)
     is Portal -> portalRef(x.id)
+    is Room -> roomRef(x.id)
     else -> throw IllegalArgumentException("Unknown data type: ${x::class.simpleName}")
 }
 
-fun UL.slot(x: Slot) = li {
+fun UL.slot(x: Slot, short: Boolean = false) = li {
     subfield("Label: ") { localizations(x) { s: SlotLocale -> s.label } }
     subfield("Description: ") { localizations(x) { s: SlotLocale -> s.description } }
+    subfield("Essential: ") { elementList(x.essential) }
     subfield("Required: ") { elementList(x.required) }
     subfield("Forbidden: ") { elementList(x.forbidden) }
-    subfield("Greedy? ") { bool(x.greedy) }
-    subfield("Consumes? ") { bool(x.consumes) }
-    subfield("If aspects present: ") { elementList(x.ifaspectspresent) }
+    if(!short) {
+        subfield("Greedy? ") { bool(x.greedy) }
+        subfield("Consumes? ") { bool(x.consumes) }
+        subfield("If aspects present: ") { elementList(x.ifaspectspresent) }
+    }
 }
 
-fun FlowContent.slots(vararg slots: Slot) {
+fun FlowContent.slots(vararg slots: Slot, short: Boolean = false) {
     if (slots.isEmpty()) {
         em { +"None" }
     } else {
         ul {
-            slots.forEach { slot(it) }
+            slots.forEach { slot(it, short) }
         }
     }
 }

@@ -3,39 +3,43 @@ package tech.uadaf.pages
 import kotlinx.html.*
 import tech.uadaf.config
 import tech.uadaf.csdata.frangiclave
+import tech.uadaf.theme
 
-private const val description =
-    "Welcome, friend, to the Frangiclave Compendium, the premier source of forbidden knowledge for the discerning occultist."
 
 fun HTML.index() = basePage(head = {
-    "Frangiclave Compendium".let { title ->
+    theme.title.let { title ->
         meta("og:title", title)
         meta("twitter:title", title)
     }
-    description.let { desc ->
+    theme.description.let { desc ->
         meta("description", desc)
         meta("og:description", desc)
         meta("twitter:description", desc)
     }
-    frangiclave("toolknockf").let {
+    frangiclave(theme.logo).let {
         meta("twitter:image", it)
         meta("og:image", it)
     }
 }) {
-    img("frangiclave", frangiclave("toolknockf")) { id = "logo" }
+    img(theme.logo, frangiclave(theme.logo)) { id = "logo" }
     p {
         id = "tagline"
-        +description
+        +theme.description
     }
     p {
-        +"The Frangiclave Compendium (Curia edition) is an open-source repository for information about the contents of the game Book of Hours beta version Curia, as extracted from the game's files. Here you can browse the decks, elements, legacies, recipes and verbs included in the game."
+        +"The ${theme.title} is an open-source repository for information about the contents of the game ${config.game}, as extracted from the game's files. Here you can browse the decks, elements, legacies, recipes and verbs included in the game."
+        br { }
+        strong {
+            +"Reuse is permitted if it follows the rules in the "
+            a(href = "https://weatherfactory.biz/sixth-history-community-licence/") { +"Sixth History License" }
+        }
     }
     p {
         +"Data taken from: ${config.version}"
     }
     div {
         p("index-foot") {
-            strong { +"Source:" }
+            strong { +"Source: " }
             a("https://github.com/gt22/frangiclave") { +"gt22/frangiclave" }
         }
         p("index-foot") {

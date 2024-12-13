@@ -3,6 +3,9 @@
   "port": 8080,
   "baseUrl": "",
   "contentDir": "bhcontent_norm",
-  "version": "Book Of Hours: Nocturnal Beta",
-  "isDebug": true
+  "game": "Book Of Hours",
+  "imageDir": "bhimages",
+  "version": "Book Of Hours 2024.12.M.5 + House Of Light",
+  "isDebug": true,
+  "theme": "rowenarium"
 }

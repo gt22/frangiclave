@@ -1,6 +1,6 @@
 package tech.uadaf.pages.data
 
-import dawnbreaker.data.raw.Culture
+import dawnbreaker.data.raw.primary.Culture
 import kotlinx.html.DIV
 import kotlinx.html.li
 import kotlinx.html.ul

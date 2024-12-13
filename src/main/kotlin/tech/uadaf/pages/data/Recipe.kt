@@ -1,33 +1,43 @@
 package tech.uadaf.pages.data
 
 import dawnbreaker.data.raw.Data
-import dawnbreaker.data.raw.Element
-import dawnbreaker.data.raw.Recipe
-import dawnbreaker.data.raw.Verb
+import dawnbreaker.data.raw.primary.Element
+import dawnbreaker.data.raw.primary.Recipe
+import dawnbreaker.data.raw.primary.Verb
 import dawnbreaker.locale.data.RecipeLocale
 import kotlinx.html.DIV
 import kotlinx.html.a
 import kotlinx.html.em
 import tech.uadaf.content
-import tech.uadaf.csdata.endingPage
 import tech.uadaf.pages.*
 
 fun Recipe.toLink(): Pair<String, Pair<String, List<String>>> {
-    val chance = if(chance != 0 && chance != 100) "$chance%" else ""
+    val chance = if (chance != 0 && chance != 100) "$chance%" else ""
     val challenges = challenges.keys.toList()
     return id to (chance to challenges)
 }
 
-fun DIV.recipe(x: Recipe) = dataPage(x) {
+fun DIV.recipe(x: Recipe) = dataPage(x, x.textContent()) {
+    field("Start label: ") { str(x.startlabel) }
     field("Label: ") { localizations(x) { r: RecipeLocale -> r.label } }
+    field("Preface: ") { localizations(x) { r: RecipeLocale -> r.preface} }
     field("Start Description: ") { localizations(x) { r: RecipeLocale -> r.startdescription } }
-    field("Inherits: ") { if(x.inherits.isNotBlank()) { recipeRef(x.inherits) } else { +"None" } }
+    field("Inherits: ") {
+        if (x.inherits.isNotBlank()) {
+            recipeRef(x.inherits)
+        } else {
+            +"None"
+        }
+    }
     field("Inherited by: ") { recipeList(content.recipes.filter { it.inherits == x.id }.associate { it.id to "" }) }
     field("Description: ") { localizations(x) { r: RecipeLocale -> r.description } }
     field("Verb: ") { verbList(unfoldWildcard<Verb>(mapOf(x.actionid to 1))) }
     field("Requirements: ") { elementListS(x.requirements) }
     field("Table Requirements: ") { elementList(x.tablereqs) }
     field("Extant Requirements: ") { elementList(x.extantreqs) }
+    field("FX Requirements: ") { elementListS(x.fxreqs) }
+    field("Joint Requirement: ") { elementListS(x.greq) }
+    field("Joint Absence Requirement") { elementListS(x.ngreq) }
     field("Effects: ") { elementListS(x.effects) }
     field("Aspects: ") { elementList(x.aspects) }
     field("Global triggers: ") { elementList(x.xpans) }
@@ -57,6 +67,12 @@ fun DIV.recipe(x: Recipe) = dataPage(x) {
             .associate { it.toLink() }
         recipeListC(recipes)
     }
+    field("Linked alternate recipes: ") {
+        val recipes = x.lalt.asSequence()
+            .unfoldWildcard()
+            .associate { it.toLink() }
+        recipeListC(recipes)
+    }
     field("Linked Recipes: ") {
         val recipes = x.linked.asSequence()
             .unfoldWildcard()
@@ -67,6 +83,7 @@ fun DIV.recipe(x: Recipe) = dataPage(x) {
         val recipes = content.recipes.asSequence()
             .filter { it.linked.any { r -> wildcardMatch(r.id, x.id) } }
             .plus(content.recipes.asSequence().filter { it.alt.any { r -> wildcardMatch(r.id, x.id) } })
+            .plus(content.recipes.asSequence().filter { it.lalt.any { r -> wildcardMatch(r.id, x.id) } })
             .sortedBy { it.id }
             .associate { it.id to "" }
         recipeList(recipes)
@@ -75,32 +92,35 @@ fun DIV.recipe(x: Recipe) = dataPage(x) {
     field("Warmup: ") { +x.warmup.toString() }
     field("Maximum executions: ") { +x.maxexecutions.toString() }
     field("Deck effects") {
-        deckList(x.deckeffects.mapValues { it.value.toString() })
+        deckList(x.deckeffects.mapValues { it.value })
     }
     field("Internal Deck: ") {
-        if(x.internaldeck == null) em { +"None" }
+        if (x.internaldeck == null) em { +"None" }
         else deckRef("internal:${x.id}")
     }
-    field("Ending Flag: ") { if(x.ending.isNotBlank()) a(endingPage(x.ending)) { +x.ending } else em { +"None" } }
+    field("Ending Flag: ") { if (x.ending.isBlank()) em { +"None" } else endingRef(x.ending) }
     field("Signal Ending Flavor: ") { str(x.signalEndingFlavour) }
-    field("Portal: ") { if(x.portaleffect.isBlank()) em { +"None" } else portalRef(x.portaleffect) }
+    field("Portal: ") { if (x.portaleffect.isBlank()) em { +"None" } else portalRef(x.portaleffect) }
     field("Craftable? ") { bool(x.craftable) }
     field("Hint Only? ") { bool(x.hintonly) }
     field("Signal Important Loop? ") { bool(x.signalimportantloop) }
-    field("Comments: ") { str(x.comments)}
+    field("Comments: ") { str(x.comments) }
 }
+
+fun Recipe.textContent() =
+    label + (if (startdescription.isNotBlank()) "\n$startdescription" else "") + (if (description.isNotBlank()) "\n\n$description" else "")
 
 inline fun <reified T : Data> unfoldWildcard(m: Map<String, Int>): Map<String, Int> = m.flatMap { (id, n) ->
     content.lookupWildcard<T>(id).map { it.id to n }
 }.toMap()
 
 inline fun <reified T : Data> Sequence<T>.unfoldWildcard(): Sequence<T> = flatMap {
-    if(it.id.endsWith('*')) {
+    if (it.id.endsWith('*')) {
         content.lookupWildcard<T>(it.id)
     } else listOf(it)
 }
 
-fun wildcardMatch(a: String, b: String) = if(a == b) {
+fun wildcardMatch(a: String, b: String) = if (a == b) {
     true
 } else if (a.endsWith('*')) {
     b.startsWith(a.substring(0, a.length - 1))

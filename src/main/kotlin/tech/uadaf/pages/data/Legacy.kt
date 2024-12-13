@@ -1,6 +1,6 @@
 package tech.uadaf.pages.data
 
-import dawnbreaker.data.raw.Legacy
+import dawnbreaker.data.raw.primary.Legacy
 import dawnbreaker.locale.data.LegacyLocale
 import kotlinx.html.DIV
 import tech.uadaf.pages.*

@@ -1,23 +1,26 @@
 package tech.uadaf.pages
 
 import dawnbreaker.data.raw.Data
-import dawnbreaker.data.raw.Element
+import dawnbreaker.data.raw.primary.Element
 import dawnbreaker.data.raw.Source
 import dawnbreaker.locale.data.ElementLocale
 import kotlinx.html.*
 import tech.uadaf.baseUrl
 import tech.uadaf.content
 import tech.uadaf.csdata.*
+import tech.uadaf.theme
 
 
 fun HTML.basePage(
     activeItem: String = "",
-    title: String = "Frangiclave",
+    title: String = theme.title,
     keywords: String = "",
+    sidebar: Boolean = true,
     head: HEAD.() -> Unit = {},
     content: DIV.() -> Unit
 ) {
     head {
+        meta("robots", "noindex, nofollow")
         link(rel = "stylesheet", href = "$baseUrl/styles.css", type = "text/css") {
             id = "styles"
         }
@@ -28,10 +31,14 @@ fun HTML.basePage(
         }
         inlinedThemeScript()
         link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Forum|Lato")
-        link(rel = "icon", type = "image/png", href = frangiclave("knock"))
+        link(rel = "icon", type = "image/png", href = frangiclave(theme.icon))
         script {
             defer = true
             src = "$baseUrl/static/script/sidebar.js"
+        }
+        script {
+            defer = true
+            src = "$baseUrl/static/script/clipboard.min.js"
         }
         script {
             src = "$baseUrl/static/script/theme.js"
@@ -43,7 +50,7 @@ fun HTML.basePage(
         header(keywords)
         div {
             id = "container"
-            sidebar(activeItem)
+            sidebar(activeItem, sidebar)
             div {
                 id = "content"
                 content()
@@ -61,8 +68,8 @@ fun FlowContent.lightswitchRef(id: String, text: String, icon: String) = a("#", 
 
 fun BODY.header(keywords: String) = header {
     a("$baseUrl/") {
-        img("knock", frangiclave("knock"))
-        h1 { +"BoHClave: Beta Curia" }
+        img(theme.icon, frangiclave(theme.icon))
+        h1 { +theme.title }
     }
     div {
         id = "switchbox"
@@ -90,26 +97,33 @@ fun BODY.header(keywords: String) = header {
     }
 }
 
-fun DIV.sidebar(activeItem: String) = div {
+fun DIV.sidebar(activeItem: String, sidebar: Boolean) = div {
     id = "sidebar"
-    div {
-        id = "sections"
-        sidebarSection("Decks", "deck", activeItem) { decks }
-        sidebarSection("Elements", "element", activeItem) { elements }
-        sidebarSection("Endings", "ending", activeItem) { endings }
-        sidebarSection("Legacies", "legacy", activeItem) { legacies }
-        sidebarSection("Recipes", "recipe", activeItem) { recipes }
-        sidebarSection("Verbs", "verb", activeItem) { verbs }
-        sidebarSection("Cultures", "culture", activeItem) { cultures }
-        sidebarSection("Dicta", "dicta", activeItem) { dicta }
-        sidebarSection("Portals", "portal", activeItem) { portals }
+    if (sidebar) {
+        div {
+            id = "sections"
+            sidebarSection("Achievements", "achievement", activeItem) { achievements }
+            sidebarSection("Decks", "deck", activeItem) { decks }
+            sidebarSection("Elements", "element", activeItem) { elements }
+            sidebarSection("Endings", "ending", activeItem) { endings }
+            sidebarSection("Legacies", "legacy", activeItem) { legacies }
+            sidebarSection("Recipes", "recipe", activeItem) { recipes }
+            sidebarSection("Rooms", "room", activeItem) { rooms }
+            sidebarSection("Verbs", "verb", activeItem) { verbs }
+            sidebarSection("Cultures", "culture", activeItem) { cultures }
+            sidebarSection("Dicta", "dicta", activeItem) { dicta }
+            sidebarSection("Portals", "portal", activeItem) { portals }
+        }
     }
 }
 
-fun DIV.sidebarSection(title: String, type: String, activeItem: String, getter: Source.() -> List<Data>) {
-    sidebarSection(title, type, activeItem, content.sources.map { (name, s) ->
+inline fun DIV.sidebarSection(title: String, type: String, activeItem: String, getter: Source.() -> List<Data>) {
+    val data = content.sources.map { (name, s) ->
         name.removePrefix("${title.lowercase()}/") to s.getter().map { it.id }
-    }.toList())
+    }.toList()
+    if (data.any { (_, d) -> d.isNotEmpty() }) {
+        sidebarSection(title, type, activeItem, data)
+    }
 }
 
 fun DIV.sidebarSection(title: String, type: String, activeItem: String, content: List<Pair<String, List<String>>>) {
@@ -136,9 +150,12 @@ fun DIV.sidebarSection(title: String, type: String, activeItem: String, content:
 }
 
 fun BODY.footer() = footer {
-    +"Cultist Simulator is the sole property of Weather Factory. All rights reserved."
+    +"Cultist Simulator and Book of Hours is the sole property of Weather Factory. All rights reserved."
     br { }
     +"All game content on this website, including images and text, is used with permission."
+    br { }
+    +"Reuse is permitted if it follows the rules in the "
+    a(href = "https://weatherfactory.biz/sixth-history-community-licence/", target = "_blank") { +"Sixth History License" }
 }
 
 fun HEAD.inlinedThemeScript() = script {

@@ -1,6 +1,7 @@
 package tech.uadaf.csdata
 
-import dawnbreaker.data.raw.*
+import dawnbreaker.data.raw.Data
+import dawnbreaker.data.raw.primary.*
 import io.ktor.http.*
 import tech.uadaf.baseUrl
 
@@ -24,6 +25,9 @@ fun dictaPage(id: String) = page("dicta", id)
 
 fun portalPage(id: String) = page("portal", id)
 
+fun achievementPage(id: String) = page("achievement", id)
+fun roomPage(id: String) = page("room", id)
+
 fun page(x: Data) = when(x) {
     is Deck -> deckPage(x.id)
     is Element -> elementPage(x.id)
@@ -34,5 +38,7 @@ fun page(x: Data) = when(x) {
     is Culture -> culturePage(x.id)
     is Dicta -> dictaPage(x.id)
     is Portal -> portalPage(x.id)
+    is Achievement -> achievementPage(x.id)
+    is Room -> roomPage(x.id)
     else -> throw IllegalArgumentException("Unknown data type: $x")
 }

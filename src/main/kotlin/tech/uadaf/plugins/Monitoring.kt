@@ -2,7 +2,7 @@ package tech.uadaf.plugins
 
 import ch.qos.logback.classic.Logger
 import io.ktor.server.application.*
-import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.request.*
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -17,7 +17,7 @@ fun Application.configureMonitoring() {
                 it.error("Unable to set log level: Unexpected logger class")
             }
         }
-        level = Level.DEBUG
+        level = Level.INFO
         filter { call -> call.request.path().startsWith("/") && !call.request.path().startsWith("/static") }
     }
 
