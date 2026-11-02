@@ -69,6 +69,9 @@ fun DIV.skillsPage() = div {
                 "skill" in it.aspects
             }.forEach { sk ->
                 val wisdoms = sk.aspects.keys.filter { it.startsWith("w.") }.map { it.removePrefix("w.") }
+                if (wisdoms.size != 2) {
+                    return@forEach
+                }
                 tr("index-skill") {
                     td("index-ref") {
                         rowSpan = "2"
