@@ -88,8 +88,19 @@ fun DIV.recipe(x: Recipe) = dataPage(x, x.textContent()) {
             .associate { it.id to "" }
         recipeList(recipes)
     }
-    field("Slots: ") { slots(*x.slots.toTypedArray()) }
-    field("Warmup: ") { +x.warmup.toString() }
+    field("Pre-slots: ") {
+        slots(*x.preslots.toTypedArray())
+    }
+    field("Slots: ") {
+        slots(*x.slots.toTypedArray())
+    }
+    field("Warmup: ") {
+        when(x.run) {
+            "" -> +x.warmup.toString()
+            "day" -> +"Until next day"
+            else -> error("Unexpected Recipe.run at ${x.id} - ${x.run}")
+        }
+    }
     field("Maximum executions: ") { +x.maxexecutions.toString() }
     field("Deck effects") {
         deckList(x.deckeffects.mapValues { it.value })

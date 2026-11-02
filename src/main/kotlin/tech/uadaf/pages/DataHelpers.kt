@@ -30,7 +30,6 @@ fun FlowContent.subfield(name: String, content: SPAN.() -> Unit) = span("content
 @Suppress("UNCHECKED_CAST")
 fun <T : Data, L : LocaleData<T>> FlowContent.localizations(x: T, get: (L) -> String) {
     val base = runCatching { locales[0][x] as L }
-    println(base)
     if (base.map(get).getOrElse { "" }.isNotBlank()) {
         ul("localizations") {
             locales.forEach {

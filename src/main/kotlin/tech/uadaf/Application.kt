@@ -23,6 +23,7 @@ import kotlin.collections.MutableList
 import kotlin.collections.asSequence
 import kotlin.collections.mutableListOf
 import kotlin.collections.set
+import kotlin.streams.asSequence
 
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -45,8 +46,12 @@ lateinit var content: Mod
 val locales: MutableList<Locale> = mutableListOf()
 
 private fun loadLocales() {
-    Files.list(Paths.get(config.contentDir))
+    val localeOrder = listOf("en", "ru", "de", "jp", "zh-hans")
+    Files.list(Paths.get(config.contentDir)).asSequence()
         .filter { it.fileName.toString().startsWith("loc_") }
+        .sortedBy { p ->
+            localeOrder.indexOfFirst { p.fileName.toString().contains(it) }
+        }
         .forEach {
             locales.add(Locale.load(it.fileName.toString().removePrefix("loc_"), vanilla, it))
         }
@@ -58,9 +63,10 @@ private fun prepareContent() {
     content.elements.forEach {
         check(it.imms.all { it.reqs.size == 1 }) { "Multi-req imm in ${it.id}" }
     }
-    content.sources.remove("rooms.json")
+
+//    content.sources.remove("rooms.json")
     content.applyInherits()
-    content.sources["temporary_verbs"] = SourceBuilder().apply {
+    content.sources_["temporary_verbs"] = SourceBuilder().apply {
         verbs {
             content.recipes.asSequence()
                 .map { it.actionid }
@@ -73,7 +79,7 @@ private fun prepareContent() {
                 }
         }
     }.t
-    content.sources["internal_recipes"] = SourceBuilder().apply {
+    content.sources_["internal_recipes"] = SourceBuilder().apply {
         recipes {
             content.recipes.asSequence().flatMap {
                 it.alt.asSequence() + it.linked.asSequence() + it.lalt.asSequence()
@@ -83,7 +89,7 @@ private fun prepareContent() {
                 }
         }
     }.t
-    content.sources["internal_decks"] = SourceBuilder().apply {
+    content.sources_["internal_decks"] = SourceBuilder().apply {
         decks {
             content.recipes.asSequence().filter { it.internaldeck != null }.forEach {
                 it.internaldeck!!.id = "internal:${it.id}"
@@ -91,7 +97,7 @@ private fun prepareContent() {
             }
         }
     }.t
-    content.sources["salon_markers"] = SourceBuilder().apply {
+    content.sources_["salon_markers"] = SourceBuilder().apply {
         aspects {
             content.recipes.asSequence()
                 .flatMap { it.mutations.map { m -> m.mutate } }
@@ -105,6 +111,7 @@ private fun prepareContent() {
         }
     }.t
     loadLocales()
+    content.sources_["recipes/terrain.json"]!!.masked = true
 }
 
 fun main() {

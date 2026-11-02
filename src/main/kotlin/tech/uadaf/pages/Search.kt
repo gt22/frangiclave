@@ -158,6 +158,7 @@ private fun findInternal(kw: String): Sequence<Pair<Data, List<String>>> = seque
                 yield(label)
                 yield(startdescription)
                 yield(description)
+                preslots.forEach { yieldSlot(it) }
                 slots.forEach { yieldSlot(it) }
             }
         })
@@ -205,7 +206,9 @@ private inline fun <reified T : Data> findl(
         data.sortedBy { (d, _) -> d.id }.forEach { (d, item) ->
             val matches = findMatches(kw, item)
             if (matches.isNotEmpty()) {
-                yield(content.lookup<T>(d.id)!! to matches)
+                content.lookup<T>(d.id)?.let {
+                    yield(it to matches)
+                }
             }
         }
     }

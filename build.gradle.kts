@@ -58,7 +58,7 @@ val jar by tasks.getting(Jar::class) {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 //    implementation("org.fusesource.jansi:jansi:2.4.0")
-    implementation("com.frgm:dawnbreaker:0.2.1-$game")
+    implementation("com.frgm:dawnbreaker:0.2.3-$game")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-host-common-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktor_version")
