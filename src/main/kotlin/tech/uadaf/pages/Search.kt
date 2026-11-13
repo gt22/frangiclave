@@ -29,7 +29,7 @@ fun HTML.search(keywords: String) = basePage(title = "Search: $keywords", keywor
         meta("og:image", it)
     }
 }) {
-    val res = find(keywords.lowercase().trim())
+    val res = find(keywords.lowercase())
     h2 {
         id = "content-title"
         span {
